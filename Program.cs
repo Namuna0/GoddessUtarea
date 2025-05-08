@@ -121,6 +121,7 @@ class Program
                 else
                 {
                     _userStatusDic[texts[0]] = new UserStatus();
+                    await message.Channel.SendMessageAsync($"{texts[0]}を登録しました！");
                 }
             }
             else if (content.StartsWith("?set bon "))
