@@ -1,6 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using dotenv.net;
+using MathNet.Numerics.Random;
+using System.Text.RegularExpressions;
 
 class Program
 {
@@ -56,6 +58,8 @@ class Program
     private DiscordSocketClient? _client;
     private Dictionary<string, UserStatus> _userStatusDic = new Dictionary<string, UserStatus>();
 
+    private MersenneTwister _ms = new MersenneTwister();
+
     static Task Main(string[] args) => new Program().MainAsync();
 
     public async Task MainAsync()
@@ -80,6 +84,10 @@ class Program
             Console.WriteLine("Discordトークンが見つかりません。");
             return;
         }
+
+        long ticks = DateTime.Now.Ticks; // 100ナノ秒単位
+        int seed = (int)(ticks & 0xFFFFFFFF); // 下位32ビットを使用
+        _ms = new MersenneTwister(seed);
 
         await _client.LoginAsync(TokenType.Bot, token);
         await _client.StartAsync();
@@ -136,16 +144,25 @@ class Program
                     await ShowBonus(texts[0], status, message);
                 });
             }
-            else if (content.StartsWith("?vit"))
+            else if (content.StartsWith("?r "))
             {
-                var text = content.Substring("?set bon ".Length);
+                var text = content.Substring("?r ".Length);
                 var texts = text.Split(" ");
-                await Command(texts, 11, message, async (status) =>
+                await Command(texts, 1, message, async (status) =>
                 {
-                    status.SetBonus(
-                        texts[1], texts[2], texts[3], texts[4], texts[5],
-                        texts[6], texts[7], texts[8], texts[9], texts[10]);
-                    await ShowBonus(texts[0], status, message);
+                    Culc(texts[1], status, out string culcResult, out string showResult);
+
+                    await message.Channel.SendMessageAsync($"{showResult}=>{culcResult}");
+                });
+            }
+            else if (content.StartsWith("?set res "))
+            {
+                var text = content.Substring("?set res ".Length);
+                var texts = text.Split(" ");
+                await Command(texts, 5, message, async (status) =>
+                {
+                    status.SetResource(int.Parse(texts[1]), int.Parse(texts[2]), int.Parse(texts[3]), int.Parse(texts[4]));
+                    await ShowResource(texts[0], status, message);
                 });
             }
             else if (content.StartsWith("?set res "))
@@ -231,12 +248,50 @@ class Program
         await message.Channel.SendMessageAsync(
             $"{key}\r\n" +
             "●リソース\r\n" +
-            $"【HP】{status.Hp}/{status.MaxHp}\r\n" +
-            $"【SP】{status.Sp}/{status.MaxSp}\r\n" +
-            $"【SAN】{status.San}/{status.MaxSan}\r\n" +
-            $"【MP】{status.Mp}/{status.MaxMp}\r\n" +
+            $"【HP】{status.Hp}/{status.MaxHp}【SP】{status.Sp}/{status.MaxSp}\r\n" +
+            $"【SAN】{status.San}/{status.MaxSan}【MP】{status.Mp}/{status.MaxMp}\r\n" +
             $"【防御点】\r\n" +
             "●状態\r\n" +
             "●永続状態");
+    }
+
+    private void Culc(string originalText, UserStatus status, out string culcResult, out string showResult)
+    {
+        string culcText = originalText;
+        string showText = originalText;
+
+        CulcBonus(@"\[生命B\]", status.VitB, ref culcText, ref showText);
+        CulcBonus("生命B", status.VitB, ref culcText, ref showText);
+
+        showText = showText.Replace("*", @"\*");
+
+        var expr = new NCalc.Expression(culcText);
+        culcResult = expr.Evaluate().ToString();
+        showResult = showText;
+    }
+
+    private void CulcBonus(string text, string bonusText, ref string culcText, ref string showText)
+    {
+        List<int> dices = new List<int>();
+
+        float culcBonus = float.Parse(bonusText);
+        string showBonus = culcBonus.ToString("0.##");
+
+        showText = Regex.Replace(showText, text, match =>
+        {
+            int dice = _ms.Next(1, 101);
+            dices.Add(dice);
+            return $"(1d100({dice})*" + showBonus;
+        });
+
+        int i = 0;
+        culcText = Regex.Replace(culcText, text, match =>
+        {
+            var result = ((int)(culcBonus * dices[i])).ToString();
+
+            i++;
+
+            return result;
+        });
     }
 }
