@@ -27,4 +27,4 @@ jobs:
       - name: Run bot
         env:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
-        run: dotnet run --project ./DiscordBot
+        run: dotnet run: dotnet run
