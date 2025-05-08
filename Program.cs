@@ -55,6 +55,10 @@ class Program
             Console.WriteLine("Discordトークンが見つかりません。");
             return;
         }
+        else
+        {
+            Console.WriteLine($"{token}");
+        }
 
         await _client.LoginAsync(TokenType.Bot, token);
         await _client.StartAsync();
