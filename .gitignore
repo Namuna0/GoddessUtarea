@@ -1,12 +1,14 @@
 # .NET / C# ビルド出力
 bin/
 obj/
-
 # ユーザーごとの設定ファイル
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
+
+# Visual Studio の一時フォルダ（無視する）
+.vs/
 
 # VS Code 用
 .vscode/
