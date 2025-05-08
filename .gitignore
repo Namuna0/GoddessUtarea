@@ -1,3 +1,30 @@
+# .NET / C# ビルド出力
+bin/
+obj/
+
+# ユーザーごとの設定ファイル
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code 用
+.vscode/
+
+# ReSharper/JetBrains Rider
+.idea/
+*.sln.iml
+
+# OS・エディタ特有のゴミファイル
+.DS_Store
+Thumbs.db
+
+# セキュリティ：秘密情報
 .env
-/build/
-/bin/
+*.env.*
+
+# ログファイル（任意）
+*.log
+
+# Publish 出力
+publish/
