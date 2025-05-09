@@ -144,12 +144,19 @@ class Program
                     await ShowBonus(texts[0], status, message);
                 });
             }
+            else if ((content == "?r"))
+            {
+                CalcFormula("1d100", null, out string culcResult, out string showResult);
+                await message.Channel.SendMessageAsync(
+                    $"<@{user.Id}> :game_die:\r\n" +
+                    $"{showResult}=>{culcResult}");
+            }
             else if (content.StartsWith("?r "))
             {
                 var text = content.Substring("?r ".Length);
                 var texts = text.Split(" ");
 
-                if (texts.Length < 1)
+                if (texts.Length < 2)
                 {
                     CalcFormula(texts[1], null, out string culcResult, out string showResult);
 
