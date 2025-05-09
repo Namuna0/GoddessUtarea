@@ -150,7 +150,7 @@ class Program
                 var texts = text.Split(" ");
                 await Command(texts, 1, message, async (status) =>
                 {
-                    Culc(texts[1], status, out string culcResult, out string showResult);
+                    CalcDice(texts[1], status, out string culcResult, out string showResult);
 
                     await message.Channel.SendMessageAsync($"{showResult}=>{culcResult}");
                 });
@@ -255,22 +255,41 @@ class Program
             "●永続状態");
     }
 
-    private void Culc(string originalText, UserStatus status, out string culcResult, out string showResult)
+    private void CalcDice(string originalText, UserStatus status, out string culcResult, out string showResult)
     {
         string culcText = originalText;
         string showText = originalText;
 
-        CulcBonus(@"\[生命B\]", status.VitB, ref culcText, ref showText);
-        CulcBonus("生命B", status.VitB, ref culcText, ref showText);
+        CulcBonusDice(@"\[生命B\]", status.VitB, ref culcText, ref showText);
+        CulcBonusDice("生命B", status.VitB, ref culcText, ref showText);
+        CulcBonusDice(@"\[精神B\]", status.VitB, ref culcText, ref showText);
+        CulcBonusDice("精神B", status.VitB, ref culcText, ref showText);
+        CulcBonusDice(@"\[筋力B\]", status.VitB, ref culcText, ref showText);
+        CulcBonusDice("筋力B", status.VitB, ref culcText, ref showText);
+        CulcBonusDice(@"\[知力N\]", status.VitB, ref culcText, ref showText);
+        CulcBonusDice("知力B", status.VitB, ref culcText, ref showText);
+        CulcBonusDice(@"\[魔力B\]", status.VitB, ref culcText, ref showText);
+        CulcBonusDice("魔力B", status.VitB, ref culcText, ref showText);
+        CulcBonusDice(@"\[器用B\]", status.VitB, ref culcText, ref showText);
+        CulcBonusDice("器用B", status.VitB, ref culcText, ref showText);
+        CulcBonusDice(@"\[敏捷B\]", status.VitB, ref culcText, ref showText);
+        CulcBonusDice("敏捷B", status.VitB, ref culcText, ref showText);
+        CulcBonusDice(@"\[感知B\]", status.VitB, ref culcText, ref showText);
+        CulcBonusDice("感知B", status.VitB, ref culcText, ref showText);
+        CulcBonusDice(@"\[魅力B\]", status.VitB, ref culcText, ref showText);
+        CulcBonusDice("魅力B", status.VitB, ref culcText, ref showText);
+        CulcBonusDice(@"\[幸運B\]", status.VitB, ref culcText, ref showText);
+        CulcBonusDice("幸運B", status.VitB, ref culcText, ref showText);
 
         showText = showText.Replace("*", @"\*");
 
         var expr = new NCalc.Expression(culcText);
-        culcResult = expr.Evaluate().ToString();
+        
+        culcResult = expr.Evaluate()?.ToString() ?? string.Empty;
         showResult = showText;
     }
 
-    private void CulcBonus(string text, string bonusText, ref string culcText, ref string showText)
+    private void CulcBonusDice(string text, string bonusText, ref string culcText, ref string showText)
     {
         List<int> dices = new List<int>();
 
