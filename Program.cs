@@ -17,16 +17,18 @@ class Program
         public int San { get; set; }
         public int Mp { get; set; }
 
-        public string VitB { get; set; }
-        public string PowB { get; set; }
-        public string StrB { get; set; }
-        public string IntB { get; set; }
-        public string MagB { get; set; }
-        public string DexB { get; set; }
-        public string AgiB { get; set; }
-        public string SnsB { get; set; }
-        public string AppB { get; set; }
-        public string LukB { get; set; }
+        public string VitB { get; set; } = "0";
+        public string PowB { get; set; } = "0";
+        public string StrB { get; set; } = "0";
+        public string IntB { get; set; } = "0";
+        public string MagB { get; set; } = "0";
+        public string DexB { get; set; } = "0";
+        public string AgiB { get; set; } = "0";
+        public string SnsB { get; set; } = "0";
+        public string AppB { get; set; } = "0";
+        public string LukB { get; set; } = "0";
+
+        public string WepP { get; set; } = "0";
 
         public void SetResource(int hp, int sp, int san, int mp)
         {
@@ -52,6 +54,11 @@ class Program
             SnsB = snsB;
             AppB = appB;
             LukB = lukB;
+        }
+
+        public void SetWeaponPower(string weponPower)
+        {
+            WepP = weponPower;
         }
     }
 
@@ -172,20 +179,16 @@ class Program
                 {
                     CalcFormula(texts[1], status, out string culcResult, out string showResult);
 
+                    string comment = string.Empty;
+                    if (texts.Length > 2)
+                    {
+                        comment = texts[2];
+                    }
+
                     await message.Channel.SendMessageAsync(
-                        $"<@{user.Id}> :game_die:\r\n" +
-                        $"{showResult}=>{culcResult}");
+                    $"<@{user.Id}> :game_die:{comment}\r\n" +
+                    $"{showResult}=>{culcResult}");
                 }
-            }
-            else if (content.StartsWith("?set res "))
-            {
-                var text = content.Substring("?set res ".Length);
-                var texts = text.Split(" ");
-                await Command(texts, 5, message, async (status) =>
-                {
-                    status.SetResource(int.Parse(texts[1]), int.Parse(texts[2]), int.Parse(texts[3]), int.Parse(texts[4]));
-                    await ShowResource(texts[0], status, message);
-                });
             }
             else if (content.StartsWith("?set res "))
             {
@@ -237,6 +240,16 @@ class Program
                     await ShowResource(texts[0], status, message);
                 });
             }
+            else if (content.StartsWith("?set wep "))
+            {
+                var text = content.Substring("?set wep ".Length);
+                var texts = text.Split(" ");
+                await Command(texts, 2, message, async (status) =>
+                {
+                    status.SetWeaponPower(texts[1]);
+                    await message.Channel.SendMessageAsync($"武器威力「{texts[1].Replace("*", @"\*")}」を登録しました！");
+                });
+            }
         }
     }
 
@@ -282,30 +295,36 @@ class Program
         string culcText = originalText;
         string showText = originalText;
 
+        if (status != null)
+        {
+            ReplaceWeponPower(@"武器威力R:(\d+)", status.WepP, ref culcText, ref showText);
+
+            ReplaceBonus("[生命B]", status.VitB, ref culcText, ref showText);
+            ReplaceBonus("[精神B]", status.PowB, ref culcText, ref showText);
+            ReplaceBonus("[筋力B]", status.StrB, ref culcText, ref showText);
+            ReplaceBonus("[知力B]", status.IntB, ref culcText, ref showText);
+            ReplaceBonus("[魔力B]", status.MagB, ref culcText, ref showText);
+            ReplaceBonus("[器用B]", status.DexB, ref culcText, ref showText);
+            ReplaceBonus("[敏捷B]", status.AgiB, ref culcText, ref showText);
+            ReplaceBonus("[感知B]", status.SnsB, ref culcText, ref showText);
+            ReplaceBonus("[魅力B]", status.AppB, ref culcText, ref showText);
+            ReplaceBonus("[幸運B]", status.LukB, ref culcText, ref showText);
+        }
+
         CalcDice(ref culcText, ref showText);
 
         if (status != null)
         {
-            CalcBonusDice(@"\[生命B\]", status.VitB, ref culcText, ref showText);
-            CalcBonusDice("生命B", status.VitB, ref culcText, ref showText);
-            CalcBonusDice(@"\[精神B\]", status.PowB, ref culcText, ref showText);
-            CalcBonusDice("精神B", status.PowB, ref culcText, ref showText);
-            CalcBonusDice(@"\[筋力B\]", status.StrB, ref culcText, ref showText);
-            CalcBonusDice("筋力B", status.StrB, ref culcText, ref showText);
-            CalcBonusDice(@"\[知力N\]", status.IntB, ref culcText, ref showText);
-            CalcBonusDice("知力B", status.IntB, ref culcText, ref showText);
-            CalcBonusDice(@"\[魔力B\]", status.MagB, ref culcText, ref showText);
-            CalcBonusDice("魔力B", status.MagB, ref culcText, ref showText);
-            CalcBonusDice(@"\[器用B\]", status.DexB, ref culcText, ref showText);
-            CalcBonusDice("器用B", status.DexB, ref culcText, ref showText);
-            CalcBonusDice(@"\[敏捷B\]", status.AgiB, ref culcText, ref showText);
-            CalcBonusDice("敏捷B", status.AgiB, ref culcText, ref showText);
-            CalcBonusDice(@"\[感知B\]", status.SnsB, ref culcText, ref showText);
-            CalcBonusDice("感知B", status.SnsB, ref culcText, ref showText);
-            CalcBonusDice(@"\[魅力B\]", status.AppB, ref culcText, ref showText);
-            CalcBonusDice("魅力B", status.AppB, ref culcText, ref showText);
-            CalcBonusDice(@"\[幸運B\]", status.LukB, ref culcText, ref showText);
-            CalcBonusDice("幸運B", status.LukB, ref culcText, ref showText);
+            CalcBonusDice("生命R", status.VitB, ref culcText, ref showText);
+            CalcBonusDice("精神R", status.PowB, ref culcText, ref showText);
+            CalcBonusDice("筋力R", status.StrB, ref culcText, ref showText);
+            CalcBonusDice("知力R", status.IntB, ref culcText, ref showText);
+            CalcBonusDice("魔力R", status.MagB, ref culcText, ref showText);
+            CalcBonusDice("器用R", status.DexB, ref culcText, ref showText);
+            CalcBonusDice("敏捷R", status.AgiB, ref culcText, ref showText);
+            CalcBonusDice("感知R", status.SnsB, ref culcText, ref showText);
+            CalcBonusDice("魅力R", status.AppB, ref culcText, ref showText);
+            CalcBonusDice("幸運R", status.LukB, ref culcText, ref showText);
         }
 
         var expr = new NCalc.Expression(culcText);
@@ -376,5 +395,24 @@ class Program
 
             return result;
         });
+    }
+
+    private void ReplaceWeponPower(string text, string weaponPower, ref string culcText, ref string showText)
+    {
+        culcText = Regex.Replace(culcText, text, match =>
+        {
+            return weaponPower.Replace("[スキル値]", match.Groups[1].Value);
+        });
+
+        showText = Regex.Replace(culcText, text, match =>
+        {
+            return weaponPower.Replace("[スキル値]", match.Groups[1].Value);
+        });
+    }
+
+    private void ReplaceBonus(string text, string bonusText, ref string culcText, ref string showText)
+    {
+        culcText = culcText.Replace(text, bonusText);
+        showText = showText.Replace(text, bonusText);
     }
 }
