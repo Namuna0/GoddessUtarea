@@ -148,14 +148,27 @@ class Program
             {
                 var text = content.Substring("?r ".Length);
                 var texts = text.Split(" ");
-                await Command(texts, 1, message, async (status) =>
+
+                if (texts.Length < 1)
+                {
+                    CalcFormula(texts[1], null, out string culcResult, out string showResult);
+
+                    await message.Channel.SendMessageAsync(
+                        $"<@{user.Id}> :game_die:\r\n" +
+                        $"{showResult}=>{culcResult}");
+                }
+                else if (!_userStatusDic.TryGetValue(texts[0], out var status))
+                {
+                    await message.Channel.SendMessageAsync("「?create [キャラクター名]」を呼んでください。");
+                }
+                else
                 {
                     CalcFormula(texts[1], status, out string culcResult, out string showResult);
 
                     await message.Channel.SendMessageAsync(
                         $"<@{user.Id}> :game_die:\r\n" +
                         $"{showResult}=>{culcResult}");
-                });
+                }
             }
             else if (content.StartsWith("?set res "))
             {
@@ -262,26 +275,30 @@ class Program
         string culcText = originalText;
         string showText = originalText;
 
-        CalcBonusDice(@"\[生命B\]", status.VitB, ref culcText, ref showText);
-        CalcBonusDice("生命B", status.VitB, ref culcText, ref showText);
-        CalcBonusDice(@"\[精神B\]", status.PowB, ref culcText, ref showText);
-        CalcBonusDice("精神B", status.PowB, ref culcText, ref showText);
-        CalcBonusDice(@"\[筋力B\]", status.StrB, ref culcText, ref showText);
-        CalcBonusDice("筋力B", status.StrB, ref culcText, ref showText);
-        CalcBonusDice(@"\[知力N\]", status.IntB, ref culcText, ref showText);
-        CalcBonusDice("知力B", status.IntB, ref culcText, ref showText);
-        CalcBonusDice(@"\[魔力B\]", status.MagB, ref culcText, ref showText);
-        CalcBonusDice("魔力B", status.MagB, ref culcText, ref showText);
-        CalcBonusDice(@"\[器用B\]", status.DexB, ref culcText, ref showText);
-        CalcBonusDice("器用B", status.DexB, ref culcText, ref showText);
-        CalcBonusDice(@"\[敏捷B\]", status.AgiB, ref culcText, ref showText);
-        CalcBonusDice("敏捷B", status.AgiB, ref culcText, ref showText);
-        CalcBonusDice(@"\[感知B\]", status.SnsB, ref culcText, ref showText);
-        CalcBonusDice("感知B", status.SnsB, ref culcText, ref showText);
-        CalcBonusDice(@"\[魅力B\]", status.AppB, ref culcText, ref showText);
-        CalcBonusDice("魅力B", status.AppB, ref culcText, ref showText);
-        CalcBonusDice(@"\[幸運B\]", status.LukB, ref culcText, ref showText);
-        CalcBonusDice("幸運B", status.LukB, ref culcText, ref showText);
+        if (status != null)
+        {
+            CalcBonusDice(@"\[生命B\]", status.VitB, ref culcText, ref showText);
+            CalcBonusDice("生命B", status.VitB, ref culcText, ref showText);
+            CalcBonusDice(@"\[精神B\]", status.PowB, ref culcText, ref showText);
+            CalcBonusDice("精神B", status.PowB, ref culcText, ref showText);
+            CalcBonusDice(@"\[筋力B\]", status.StrB, ref culcText, ref showText);
+            CalcBonusDice("筋力B", status.StrB, ref culcText, ref showText);
+            CalcBonusDice(@"\[知力N\]", status.IntB, ref culcText, ref showText);
+            CalcBonusDice("知力B", status.IntB, ref culcText, ref showText);
+            CalcBonusDice(@"\[魔力B\]", status.MagB, ref culcText, ref showText);
+            CalcBonusDice("魔力B", status.MagB, ref culcText, ref showText);
+            CalcBonusDice(@"\[器用B\]", status.DexB, ref culcText, ref showText);
+            CalcBonusDice("器用B", status.DexB, ref culcText, ref showText);
+            CalcBonusDice(@"\[敏捷B\]", status.AgiB, ref culcText, ref showText);
+            CalcBonusDice("敏捷B", status.AgiB, ref culcText, ref showText);
+            CalcBonusDice(@"\[感知B\]", status.SnsB, ref culcText, ref showText);
+            CalcBonusDice("感知B", status.SnsB, ref culcText, ref showText);
+            CalcBonusDice(@"\[魅力B\]", status.AppB, ref culcText, ref showText);
+            CalcBonusDice("魅力B", status.AppB, ref culcText, ref showText);
+            CalcBonusDice(@"\[幸運B\]", status.LukB, ref culcText, ref showText);
+            CalcBonusDice("幸運B", status.LukB, ref culcText, ref showText);
+        }
+
         CalcDice(ref culcText, ref showText);
 
         var expr = new NCalc.Expression(culcText);
