@@ -1,5 +1,4 @@
-﻿using Antlr4.Runtime.Misc;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using dotenv.net;
 using MathNet.Numerics.Random;
@@ -151,11 +150,11 @@ class Program
                 var texts = text.Split(" ");
                 await Command(texts, 1, message, async (status) =>
                 {
-                    CalcDice(texts[1], status, out string culcResult, out string showResult);
+                    CalcFormula(texts[1], status, out string culcResult, out string showResult);
 
                     await message.Channel.SendMessageAsync(
-                        $"<@{user.Id}>\r\n" +
-                        $":game_die:{showResult}=>{culcResult}");
+                        $"<@{user.Id}> :game_die:\r\n" +
+                        $"{showResult}=>{culcResult}");
                 });
             }
             else if (content.StartsWith("?set res "))
@@ -258,40 +257,72 @@ class Program
             "●永続状態");
     }
 
-    private void CalcDice(string originalText, UserStatus status, out string culcResult, out string showResult)
+    private void CalcFormula(string originalText, UserStatus status, out string culcResult, out string showResult)
     {
         string culcText = originalText;
         string showText = originalText;
 
-        CulcBonusDice(@"\[生命B\]", status.VitB, ref culcText, ref showText);
-        CulcBonusDice("生命B", status.VitB, ref culcText, ref showText);
-        CulcBonusDice(@"\[精神B\]", status.PowB, ref culcText, ref showText);
-        CulcBonusDice("精神B", status.PowB, ref culcText, ref showText);
-        CulcBonusDice(@"\[筋力B\]", status.StrB, ref culcText, ref showText);
-        CulcBonusDice("筋力B", status.StrB, ref culcText, ref showText);
-        CulcBonusDice(@"\[知力N\]", status.IntB, ref culcText, ref showText);
-        CulcBonusDice("知力B", status.IntB, ref culcText, ref showText);
-        CulcBonusDice(@"\[魔力B\]", status.MagB, ref culcText, ref showText);
-        CulcBonusDice("魔力B", status.MagB, ref culcText, ref showText);
-        CulcBonusDice(@"\[器用B\]", status.DexB, ref culcText, ref showText);
-        CulcBonusDice("器用B", status.DexB, ref culcText, ref showText);
-        CulcBonusDice(@"\[敏捷B\]", status.AgiB, ref culcText, ref showText);
-        CulcBonusDice("敏捷B", status.AgiB, ref culcText, ref showText);
-        CulcBonusDice(@"\[感知B\]", status.SnsB, ref culcText, ref showText);
-        CulcBonusDice("感知B", status.SnsB, ref culcText, ref showText);
-        CulcBonusDice(@"\[魅力B\]", status.AppB, ref culcText, ref showText);
-        CulcBonusDice("魅力B", status.AppB, ref culcText, ref showText);
-        CulcBonusDice(@"\[幸運B\]", status.LukB, ref culcText, ref showText);
-        CulcBonusDice("幸運B", status.LukB, ref culcText, ref showText);
+        CalcBonusDice(@"\[生命B\]", status.VitB, ref culcText, ref showText);
+        CalcBonusDice("生命B", status.VitB, ref culcText, ref showText);
+        CalcBonusDice(@"\[精神B\]", status.PowB, ref culcText, ref showText);
+        CalcBonusDice("精神B", status.PowB, ref culcText, ref showText);
+        CalcBonusDice(@"\[筋力B\]", status.StrB, ref culcText, ref showText);
+        CalcBonusDice("筋力B", status.StrB, ref culcText, ref showText);
+        CalcBonusDice(@"\[知力N\]", status.IntB, ref culcText, ref showText);
+        CalcBonusDice("知力B", status.IntB, ref culcText, ref showText);
+        CalcBonusDice(@"\[魔力B\]", status.MagB, ref culcText, ref showText);
+        CalcBonusDice("魔力B", status.MagB, ref culcText, ref showText);
+        CalcBonusDice(@"\[器用B\]", status.DexB, ref culcText, ref showText);
+        CalcBonusDice("器用B", status.DexB, ref culcText, ref showText);
+        CalcBonusDice(@"\[敏捷B\]", status.AgiB, ref culcText, ref showText);
+        CalcBonusDice("敏捷B", status.AgiB, ref culcText, ref showText);
+        CalcBonusDice(@"\[感知B\]", status.SnsB, ref culcText, ref showText);
+        CalcBonusDice("感知B", status.SnsB, ref culcText, ref showText);
+        CalcBonusDice(@"\[魅力B\]", status.AppB, ref culcText, ref showText);
+        CalcBonusDice("魅力B", status.AppB, ref culcText, ref showText);
+        CalcBonusDice(@"\[幸運B\]", status.LukB, ref culcText, ref showText);
+        CalcBonusDice("幸運B", status.LukB, ref culcText, ref showText);
+        CalcDice(ref culcText, ref showText);
+
         var expr = new NCalc.Expression(culcText);
 
         showText = showText.Replace("*", @"\*");
 
-        culcResult = expr.Evaluate()?.ToString() ?? string.Empty;
-        showResult = float.Parse(showText).ToString("0.##");
+        culcResult = float.Parse(expr.Evaluate()?.ToString() ?? "0").ToString("0.##");
+        showResult = showText;
     }
 
-    private void CulcBonusDice(string text, string bonusText, ref string culcText, ref string showText)
+    private void CalcDice(ref string culcText, ref string showText)
+    {
+        List<int> dices = new List<int>();
+
+        showText = Regex.Replace(showText, @"(\d+)d(\d+)", match =>
+        {
+            int count = int.Parse(match.Groups[1].Value);
+            int sides = int.Parse(match.Groups[2].Value);
+
+            int total = 0;
+            for (int i = 0; i < count; i++)
+            {
+                total += _ms.Next(1, sides + 1);
+            }
+            dices.Add(total);
+
+            return $"{count}d{sides}({total})";
+        });
+
+        int i = 0;
+        culcText = Regex.Replace(culcText, @"(\d+)d(\d+)", match =>
+        {
+            var result = (dices[i]).ToString();
+
+            i++;
+
+            return result;
+        });
+    }
+
+    private void CalcBonusDice(string text, string bonusText, ref string culcText, ref string showText)
     {
         List<int> dices = new List<int>();
 
@@ -308,7 +339,7 @@ class Program
         int i = 0;
         culcText = Regex.Replace(culcText, text, match =>
         {
-            var result = (culcBonus * dices[i]).ToString("");
+            var result = (culcBonus * dices[i]).ToString();
 
             i++;
 
