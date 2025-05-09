@@ -158,7 +158,7 @@ class Program
 
                 if (texts.Length < 2)
                 {
-                    CalcFormula(texts[1], null, out string culcResult, out string showResult);
+                    CalcFormula(texts[0], null, out string culcResult, out string showResult);
 
                     await message.Channel.SendMessageAsync(
                         $"<@{user.Id}> :game_die:\r\n" +
