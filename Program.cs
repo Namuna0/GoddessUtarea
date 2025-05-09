@@ -300,7 +300,7 @@ class Program
         {
             int dice = _ms.Next(1, 101);
             dices.Add(dice);
-            return $"(1d100({dice})\\*" + showBonus;
+            return $"1d100({dice})\\*" + showBonus;
         });
 
         int i = 0;
