@@ -284,9 +284,11 @@ class Program
         CulcBonusDice(@"\[幸運B\]", status.LukB, ref culcText, ref showText);
         CulcBonusDice("幸運B", status.LukB, ref culcText, ref showText);
         var expr = new NCalc.Expression(culcText);
-        
+
+        showText = showText.Replace("*", @"\*");
+
         culcResult = expr.Evaluate()?.ToString() ?? string.Empty;
-        showResult = showText.ToString();
+        showResult = float.Parse(showText).ToString("0.##");
     }
 
     private void CulcBonusDice(string text, string bonusText, ref string culcText, ref string showText)
@@ -300,13 +302,13 @@ class Program
         {
             int dice = _ms.Next(1, 101);
             dices.Add(dice);
-            return $"1d100({dice})\\*" + showBonus;
+            return $"1d100({dice})*" + showBonus;
         });
 
         int i = 0;
         culcText = Regex.Replace(culcText, text, match =>
         {
-            var result = (culcBonus * dices[i]).ToString("0.##");
+            var result = (culcBonus * dices[i]).ToString("");
 
             i++;
 
