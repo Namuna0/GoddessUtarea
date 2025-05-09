@@ -318,7 +318,7 @@ class Program
 
     private void CalcDice(ref string culcText, ref string showText)
     {
-        List<int> dices = new List<int>();
+        List<int> totals = new List<int>();
 
         showText = Regex.Replace(showText, @"(\d+)d(\d+)", match =>
         {
@@ -326,19 +326,26 @@ class Program
             int sides = int.Parse(match.Groups[2].Value);
 
             int total = 0;
+            string dices = "";
+
             for (int i = 0; i < count; i++)
             {
-                total += _ms.Next(1, sides + 1);
-            }
-            dices.Add(total);
+                if (i > 0) dices += ", ";
 
-            return $"{count}d{sides}({total})";
+                int dice = _ms.Next(1, sides + 1);
+
+                total += dice;
+                dices += dice.ToString();
+            }
+            totals.Add(total);
+
+            return $"{count}d{sides}({dices})";
         });
 
         int i = 0;
         culcText = Regex.Replace(culcText, @"(\d+)d(\d+)", match =>
         {
-            var result = (dices[i]).ToString();
+            var result = (totals[i]).ToString();
 
             i++;
 
