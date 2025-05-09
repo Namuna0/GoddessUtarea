@@ -282,6 +282,8 @@ class Program
         string culcText = originalText;
         string showText = originalText;
 
+        CalcDice(ref culcText, ref showText);
+
         if (status != null)
         {
             CalcBonusDice(@"\[生命B\]", status.VitB, ref culcText, ref showText);
@@ -305,8 +307,6 @@ class Program
             CalcBonusDice(@"\[幸運B\]", status.LukB, ref culcText, ref showText);
             CalcBonusDice("幸運B", status.LukB, ref culcText, ref showText);
         }
-
-        CalcDice(ref culcText, ref showText);
 
         var expr = new NCalc.Expression(culcText);
 
