@@ -77,7 +77,7 @@ partial class Program
             {
                 await SetBon(message, guild, user, content);
             }
-            else if (content.StartsWith("?r"))
+            else if (content == "?r")
             {
                 await SimpleRoll(message, guild, user, content);
             }

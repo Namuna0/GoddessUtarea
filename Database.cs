@@ -4,8 +4,7 @@ partial class Program
 {
     public async Task ConnectDatabase(string sql, Action<NpgsqlParameterCollection> onCommand = null, Func<NpgsqlDataReader, Task> onResponce = null, Func<Task> onError = null)
     {
-        //var connString = Environment.GetEnvironmentVariable("DATABASE_URL");
-        var url = "postgresql://postgres:zJnQuTbhZViHuMgLZqTXbLifsfLwBGoO@interchange.proxy.rlwy.net:13123/railway";
+        var connString = Environment.GetEnvironmentVariable("DATABASE_URL");
         if (string.IsNullOrEmpty(url))
         {
             Console.WriteLine("DATABASE_URLが設定されていません");
