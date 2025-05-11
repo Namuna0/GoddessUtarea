@@ -109,10 +109,6 @@ partial class Program
             {
                 await SetWep(message, guild, user, content);
             }
-            else if(content.StartsWith("?"))
-            {
-                await message.Channel.SendMessageAsync(":eyes:それはコマンドですか？");
-            }
         }
     }
 }
