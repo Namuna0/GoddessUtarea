@@ -2,11 +2,14 @@
 using Discord.WebSocket;
 using dotenv.net;
 using MathNet.Numerics.Random;
+using Npgsql;
 
 partial class Program
 {
     private DiscordSocketClient? _client;
-    private Dictionary<ulong, UserStatus> _userStatusDic = new Dictionary<ulong, UserStatus>();
+    private NpgsqlConnection? _connection;
+
+    private Dictionary<ulong, string> _currentCharaDic = new Dictionary<ulong, string>();
 
     private MersenneTwister _ms = new MersenneTwister();
 
@@ -14,11 +17,24 @@ partial class Program
 
     public async Task MainAsync()
     {
+        await ConnectServer();
+
+        await Task.Delay(-1); // 永久に実行
+    }
+
+    private Task Log(LogMessage msg)
+    {
+        Console.WriteLine(msg.ToString());
+        return Task.CompletedTask;
+    }
+
+    private async Task ConnectServer()
+    {
         var config = new DiscordSocketConfig
         {
             GatewayIntents = GatewayIntents.AllUnprivileged |
-                     GatewayIntents.MessageContent |
-                     GatewayIntents.GuildMessages
+             GatewayIntents.MessageContent |
+             GatewayIntents.GuildMessages
         };
 
         _client = new DiscordSocketClient(config);
@@ -41,14 +57,6 @@ partial class Program
 
         await _client.LoginAsync(TokenType.Bot, token);
         await _client.StartAsync();
-
-        await Task.Delay(-1); // 永久に実行
-    }
-
-    private Task Log(LogMessage msg)
-    {
-        Console.WriteLine(msg.ToString());
-        return Task.CompletedTask;
     }
 
     private async Task MessageReceivedAsync(SocketMessage message)
@@ -68,6 +76,10 @@ partial class Program
             else if (content.StartsWith("?set bon "))
             {
                 await SetBon(message, guild, user, content);
+            }
+            else if (content.StartsWith("?r"))
+            {
+                await SimpleRoll(message, guild, user, content);
             }
             else if (content.StartsWith("?r "))
             {
@@ -96,6 +108,10 @@ partial class Program
             else if (content.StartsWith("?set wep "))
             {
                 await SetWep(message, guild, user, content);
+            }
+            else if(content.StartsWith("?"))
+            {
+                await message.Channel.SendMessageAsync(":eyes:それはコマンドですか？");
             }
         }
     }
