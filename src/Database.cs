@@ -21,7 +21,8 @@ partial class Program
             Username = userInfo[0],
             Password = userInfo[1],
             Database = uri.AbsolutePath.TrimStart('/'),
-            SslMode = SslMode.VerifyFull,
+            SslMode = SslMode.Require,
+            TrustServerCertificate = false
         };
 
         await using var conn = new NpgsqlConnection(builder.ConnectionString);
