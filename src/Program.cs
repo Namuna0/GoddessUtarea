@@ -32,9 +32,7 @@ partial class Program
     {
         var config = new DiscordSocketConfig
         {
-            GatewayIntents = GatewayIntents.AllUnprivileged |
-             GatewayIntents.MessageContent |
-             GatewayIntents.GuildMessages
+            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages | GatewayIntents.MessageContent
         };
 
         _client = new DiscordSocketClient(config);

@@ -21,8 +21,7 @@ partial class Program
             Username = userInfo[0],
             Password = userInfo[1],
             Database = uri.AbsolutePath.TrimStart('/'),
-            SslMode = SslMode.Require,
-            TrustServerCertificate = true
+            SslMode = SslMode.VerifyFull,
         };
 
         await using var conn = new NpgsqlConnection(builder.ConnectionString);
@@ -48,27 +47,4 @@ partial class Program
             }
         }
     }
-
-    //var createSql = @"CREATE TABLE IF NOT EXISTS user_status (
-    //id TEXT PRIMARY KEY,
-    //max_hp SMALLINT DEFAULT 0,
-    //max_sp  SMALLINT DEFAULT 0,
-    //max_san SMALLINT DEFAULT 0,
-    //max_mp SMALLINT DEFAULT 0,
-    //hp SMALLINT DEFAULT 0,
-    //sp  SMALLINT DEFAULT 0,
-    //san SMALLINT DEFAULT 0,
-    //mp SMALLINT DEFAULT 0,
-    //vit_b REAL DEFAULT 0.0,
-    //pow_b REAL DEFAULT 0.0,
-    //str_b REAL DEFAULT 0.0,
-    //int_b REAL DEFAULT 0.0,
-    //mag_b REAL DEFAULT 0.0,
-    //dex_b REAL DEFAULT 0.0,
-    //agi_b REAL DEFAULT 0.0,
-    //sns_b REAL DEFAULT 0.0,
-    //app_b REAL DEFAULT 0.0,
-    //luk_b REAL DEFAULT 0.0,
-    //wep_p TEXT DEFAULT '0',
-    //created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
 }
