@@ -184,7 +184,7 @@ partial class Program
     }
     private async Task ShowMasterRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {
-        var text = content.Substring($"?show maste res ".Length);
+        var text = content.Substring($"?show master res ".Length);
         var texts = text.Split(" ");
 
         if (texts.Length < 1)
@@ -212,7 +212,7 @@ partial class Program
                     parameters.AddWithValue($"{res}", short.Parse(texts[1]));
                 });
 
-            await ShowResource(currentChara, message);
+            await ShowResource(texts[0], message);
         });
     }
 
