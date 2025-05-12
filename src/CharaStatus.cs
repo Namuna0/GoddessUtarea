@@ -234,7 +234,7 @@ partial class Program
             await ConnectDatabase(
                 @"INSERT INTO user_status (id, wep_p)" +
                 @"VALUES (@id, @wep_p)" +
-                @"ON CONFLICT (id) DO UPDATE;",
+                @"ON CONFLICT (id) DO UPDATE SET wep_p = EXCLUDED.wep_p;",
                 parameters =>
                 {
                     parameters.AddWithValue("id", currentChara);
