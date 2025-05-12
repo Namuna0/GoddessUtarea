@@ -71,17 +71,17 @@ partial class Program
             {
                 await Login(message, guild, user, content);
             }
-            else if (content.StartsWith("?set bon "))
+            else if (content.StartsWith("?set data "))
             {
-                await SetBon(message, guild, user, content);
+                await ShowData(message, guild, user, content);
             }
-            else if (content == "?r")
+            else if (content.StartsWith("?set res data"))
             {
-                await SimpleRoll(message, guild, user, content);
+                await SetData(message, guild, user, content);
             }
-            else if (content.StartsWith("?r "))
+            else if (content == "?show res")
             {
-                await DiceRoll(message, guild, user, content);
+                await ShowRes(message, guild, user, content);
             }
             else if (content.StartsWith("?set res "))
             {
@@ -103,9 +103,25 @@ partial class Program
             {
                 await UpdateMp(message, guild, user, content);
             }
+            else if (content == "?show bon")
+            {
+                await ShowBon(message, guild, user, content);
+            }
+            else if (content.StartsWith("?set bon "))
+            {
+                await SetBon(message, guild, user, content);
+            }
             else if (content.StartsWith("?set wep "))
             {
                 await SetWep(message, guild, user, content);
+            }
+            else if (content == "?r")
+            {
+                await SimpleRoll(message, guild, user, content);
+            }
+            else if (content.StartsWith("?r "))
+            {
+                await DiceRoll(message, guild, user, content);
             }
         }
     }

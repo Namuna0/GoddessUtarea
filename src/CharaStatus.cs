@@ -70,7 +70,7 @@ partial class Program
         await Command(texts, 1, message, user, async (currentChara) =>
         {
             await ConnectDatabase(
-                @"SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b FROM user_status WHERE id = @id",
+                @"SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b, wep_p FROM user_status WHERE id = @id",
                 parameters =>
                 {
                     parameters.AddWithValue("id", currentChara);
@@ -88,6 +88,7 @@ partial class Program
                     status.SnsB = reader.GetFloat(7);
                     status.AppB = reader.GetFloat(8);
                     status.LukB = reader.GetFloat(9);
+                    status.WepP = reader.GetString(10);
 
                     CalcFormula(texts[0], status, out string culcResult, out string showResult);
 
@@ -107,6 +108,18 @@ partial class Program
                 });
         });
     }
+
+    private async Task ShowRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    {
+        if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
+        {
+            await message.Channel.SendMessageAsync("「?login [キャラクター名]」を呼んでください。");
+            return;
+        }
+
+        await ShowResource(currentChara, message);
+    }
+
 
     private async Task SetRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {
@@ -225,24 +238,15 @@ partial class Program
         });
     }
 
-    private async Task SetWep(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task ShowBon(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {
-        var text = content.Substring("?set wep ".Length);
-        var texts = text.Split(" ");
-        await Command(texts, 1, message, user, async (currentChara) =>
+        if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
         {
-            await ConnectDatabase(
-                @"INSERT INTO user_status (id, wep_p)" +
-                @"VALUES (@id, @wep_p)" +
-                @"ON CONFLICT (id) DO UPDATE SET wep_p = EXCLUDED.wep_p;",
-                parameters =>
-                {
-                    parameters.AddWithValue("id", currentChara);
-                    parameters.AddWithValue("wep_p", texts[0]);
-                });
+            await message.Channel.SendMessageAsync("「?login [キャラクター名]」を呼んでください。");
+            return;
+        }
 
-            await message.Channel.SendMessageAsync($"{currentChara}：武器威力「{texts[0].Replace("*", @"\*")}」を登録しました。");
-        });
+        await ShowBonus(currentChara, message);
     }
 
     private async Task SetBon(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
@@ -283,6 +287,26 @@ partial class Program
                 });
 
             await ShowBonus(currentChara, status, message);
+        });
+    }
+
+    private async Task SetWep(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    {
+        var text = content.Substring("?set wep ".Length);
+        var texts = text.Split(" ");
+        await Command(texts, 1, message, user, async (currentChara) =>
+        {
+            await ConnectDatabase(
+                @"INSERT INTO user_status (id, wep_p)" +
+                @"VALUES (@id, @wep_p)" +
+                @"ON CONFLICT (id) DO UPDATE SET wep_p = EXCLUDED.wep_p;",
+                parameters =>
+                {
+                    parameters.AddWithValue("id", currentChara);
+                    parameters.AddWithValue("wep_p", texts[0]);
+                });
+
+            await message.Channel.SendMessageAsync($"{currentChara}：武器威力「{texts[0].Replace("*", @"\*")}」を登録しました。");
         });
     }
 

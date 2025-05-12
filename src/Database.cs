@@ -1,4 +1,5 @@
-﻿using Npgsql;
+﻿using Discord.WebSocket;
+using Npgsql;
 
 partial class Program
 {
@@ -47,5 +48,50 @@ partial class Program
                 onError?.Invoke();
             }
         }
+    }
+
+    private async Task ShowData(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    {
+        var text = content.Substring("?show data ".Length);
+        var texts = text.Split(" ");
+
+        await ConnectDatabase(
+            @"SELECT text FROM database WHERE id = @id",
+            parameters =>
+            {
+                parameters.AddWithValue("id", texts[0]);
+            },
+            async (reader) =>
+            {
+                await message.Channel.SendMessageAsync(reader.GetString(0));
+            },
+            async () =>
+            {
+                await message.Channel.SendMessageAsync("データが見つかりませんでした。");
+            });
+    }
+
+    private async Task SetData(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    {
+        var text = content.Substring("?set data ".Length);
+        var texts = text.Split(" ");
+
+        if (texts.Length < 1)
+        {
+            await message.Channel.SendMessageAsync("引数が変です。");
+            return;
+        }
+
+        await ConnectDatabase(
+            @"INSERT INTO database (id, text)" +
+            @"VALUES (@id, @text)" +
+            @"ON CONFLICT (id) DO UPDATE SET text = EXCLUDED.text;",
+            parameters =>
+            {
+                parameters.AddWithValue("id", texts[0]);
+                parameters.AddWithValue("text", texts[1]);
+            });
+
+        await message.Channel.SendMessageAsync($"```{texts[1]}```");
     }
 }
