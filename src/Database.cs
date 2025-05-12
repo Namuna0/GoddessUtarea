@@ -75,7 +75,7 @@ partial class Program
     {
         var text = content.Substring("?set data ".Length);
         var texts = text.Split(" ");
-        var mainText = text.Substring(texts[0].Length);
+        var mainText = text.Substring(texts[0].Length + 1);
 
         if (texts.Length < 1)
         {
@@ -90,7 +90,7 @@ partial class Program
             parameters =>
             {
                 parameters.AddWithValue("id", texts[0]);
-                parameters.AddWithValue("text", texts[1]);
+                parameters.AddWithValue("text", mainText);
             });
 
         await message.Channel.SendMessageAsync($"```{mainText}```");
