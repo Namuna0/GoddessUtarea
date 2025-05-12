@@ -71,11 +71,11 @@ partial class Program
             {
                 await Login(message, guild, user, content);
             }
-            else if (content.StartsWith("?set data "))
+            else if (content.StartsWith("?show data "))
             {
                 await ShowData(message, guild, user, content);
             }
-            else if (content.StartsWith("?set res data"))
+            else if (content.StartsWith("?set data"))
             {
                 await SetData(message, guild, user, content);
             }
