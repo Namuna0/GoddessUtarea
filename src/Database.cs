@@ -53,12 +53,13 @@ partial class Program
     private async Task ShowData(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {
         var text = content.Substring("?show data ".Length);
+        var texts = text.Split(" ");
 
         await ConnectDatabase(
             @"SELECT text FROM database WHERE id = @id",
             parameters =>
             {
-                parameters.AddWithValue("id", text);
+                parameters.AddWithValue("id", texts[0]);
             },
             async (reader) =>
             {
@@ -74,6 +75,7 @@ partial class Program
     {
         var text = content.Substring("?set data ".Length);
         var texts = text.Split(" ");
+        var mainText = text.Substring(texts[0].Length);
 
         if (texts.Length < 1)
         {
@@ -91,6 +93,6 @@ partial class Program
                 parameters.AddWithValue("text", texts[1]);
             });
 
-        await message.Channel.SendMessageAsync($"```{texts[1]}```");
+        await message.Channel.SendMessageAsync($"```{mainText}```");
     }
 }
