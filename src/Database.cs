@@ -63,7 +63,7 @@ partial class Program
             },
             async (reader) =>
             {
-                await message.Channel.SendMessageAsync(reader.GetString(0));
+                await message.Channel.SendMessageAsync($"```{reader.GetString(0)}```");
             },
             async () =>
             {
