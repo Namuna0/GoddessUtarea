@@ -53,13 +53,12 @@ partial class Program
     private async Task ShowData(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {
         var text = content.Substring("?show data ".Length);
-        var texts = text.Split(" ");
 
         await ConnectDatabase(
             @"SELECT text FROM database WHERE id = @id",
             parameters =>
             {
-                parameters.AddWithValue("id", texts[0]);
+                parameters.AddWithValue("id", text);
             },
             async (reader) =>
             {
