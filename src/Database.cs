@@ -55,6 +55,12 @@ partial class Program
         var text = content.Substring("?show data ".Length);
         var texts = text.Split(" ");
 
+        if (texts.Length < 1)
+        {
+            await message.Channel.SendMessageAsync("引数が変です。");
+            return;
+        }
+
         await ConnectDatabase(
             @"SELECT text FROM database WHERE id = @id",
             parameters =>
@@ -77,7 +83,7 @@ partial class Program
         var texts = text.Split(" ");
         var mainText = text.Substring(texts[0].Length + 1);
 
-        if (texts.Length < 1)
+        if (texts.Length < 2)
         {
             await message.Channel.SendMessageAsync("引数が変です。");
             return;

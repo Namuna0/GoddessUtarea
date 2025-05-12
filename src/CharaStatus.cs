@@ -33,16 +33,13 @@ partial class Program
         var text = content.Substring("?login ".Length);
         var texts = text.Split(" ");
 
-        if (texts.Length < 1)
+        if (!GetPaseFlag(texts, 3))
         {
             await message.Channel.SendMessageAsync("引数が変です。");
             return;
         }
-
-        if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
-        {
-            _currentCharaDic.Add(user.Id, texts[0]);
-        }
+       
+        _currentCharaDic[user.Id] = texts[0];
 
         await message.Channel.SendMessageAsync($"こんにちは、{texts[0]}さん！");
     }
@@ -67,46 +64,55 @@ partial class Program
         var text = content.Substring("?r ".Length);
         var texts = text.Split(" ");
 
-        await Command(texts, 1, message, user, async (currentChara) =>
+        if (!GetPaseFlag(texts, 3) && !GetPaseFlag(texts, 33))
         {
-            await ConnectDatabase(
-                @"SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b, wep_p FROM user_status WHERE id = @id",
-                parameters =>
-                {
-                    parameters.AddWithValue("id", currentChara);
-                },
-                async (reader) =>
-                {
-                    var status = new CharacterStatus();
-                    status.VitB = reader.GetFloat(0);
-                    status.PowB = reader.GetFloat(1);
-                    status.StrB = reader.GetFloat(2);
-                    status.IntB = reader.GetFloat(3);
-                    status.MagB = reader.GetFloat(4);
-                    status.DexB = reader.GetFloat(5);
-                    status.AgiB = reader.GetFloat(6);
-                    status.SnsB = reader.GetFloat(7);
-                    status.AppB = reader.GetFloat(8);
-                    status.LukB = reader.GetFloat(9);
-                    status.WepP = reader.GetString(10);
+            await message.Channel.SendMessageAsync("引数が変です。");
+            return;
+        }
 
-                    CalcFormula(texts[0], status, out string culcResult, out string showResult);
+        if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
+        {
+            await message.Channel.SendMessageAsync("「?login [キャラクター名]」を呼んでください。");
+            return;
+        }
 
-                    string comment = string.Empty;
-                    if (texts.Length > 1)
-                    {
-                        comment = $"：{texts[1]}";
-                    }
+        await ConnectDatabase(
+            @"SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b, wep_p FROM user_status WHERE id = @id",
+            parameters =>
+            {
+                parameters.AddWithValue("id", currentChara);
+            },
+            async (reader) =>
+            {
+                var status = new CharacterStatus();
+                status.VitB = reader.GetFloat(0);
+                status.PowB = reader.GetFloat(1);
+                status.StrB = reader.GetFloat(2);
+                status.IntB = reader.GetFloat(3);
+                status.MagB = reader.GetFloat(4);
+                status.DexB = reader.GetFloat(5);
+                status.AgiB = reader.GetFloat(6);
+                status.SnsB = reader.GetFloat(7);
+                status.AppB = reader.GetFloat(8);
+                status.LukB = reader.GetFloat(9);
+                status.WepP = reader.GetString(10);
 
-                    await message.Channel.SendMessageAsync(
-                    $"<@{user.Id}> :game_die:{currentChara}\r\n" +
-                    $"{showResult}=>{culcResult}");
-                },
-                async () =>
+                CalcFormula(texts[0], status, out string culcResult, out string showResult);
+
+                string comment = string.Empty;
+                if (texts.Length > 1)
                 {
-                    await message.Channel.SendMessageAsync("キャラクターが見つかりませんでした。");
-                });
-        });
+                    comment = $"：{texts[1]}";
+                }
+
+                await message.Channel.SendMessageAsync(
+                $"<@{user.Id}> :game_die:{currentChara}\r\n" +
+                $"{showResult}=>{culcResult}");
+            },
+            async () =>
+            {
+                await message.Channel.SendMessageAsync("キャラクターが見つかりませんでした。");
+            });
     }
 
     private async Task ShowRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
@@ -120,12 +126,11 @@ partial class Program
         await ShowResource(currentChara, message);
     }
 
-
     private async Task SetRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {
         var text = content.Substring("?set res ".Length);
         var texts = text.Split(" ");
-        await Command(texts, 4, message, user, async (currentChara) =>
+        await Command(texts, 1111, message, user, async (currentChara) =>
         {
             var status = new CharacterStatus();
             status.MaxHp = short.Parse(texts[0]);
@@ -158,80 +163,53 @@ partial class Program
         });
     }
 
-    private async Task UpdateHp(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task UpdateRes(string res, SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {
-        var text = content.Substring("?hp ".Length);
+        var text = content.Substring($"?{res} ".Length);
         var texts = text.Split(" ");
         await Command(texts, 1, message, user, async (currentChara) =>
         {
             await ConnectDatabase(
-                @"INSERT INTO user_status (id, hp)" +
-                @"VALUES (@id, @hp)" +
-                @"ON CONFLICT (id) DO UPDATE SET hp = user_status.hp + EXCLUDED.hp;",
+                @$"INSERT INTO user_status (id, {res})" +
+                @$"VALUES (@id, @{res})" +
+                @$"ON CONFLICT (id) DO UPDATE SET {res} = user_status.{res} + EXCLUDED.{res};",
                 parameters =>
                 {
                     parameters.AddWithValue("id", currentChara);
-                    parameters.AddWithValue("hp", short.Parse(texts[0]));
+                    parameters.AddWithValue($"{res}", short.Parse(texts[0]));
                 });
 
             await ShowResource(currentChara, message);
         });
     }
-
-    private async Task UpdateSp(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task ShowMasterRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {
-        var text = content.Substring("?sp ".Length);
+        var text = content.Substring($"?show maste res ".Length);
         var texts = text.Split(" ");
-        await Command(texts, 1, message, user, async (currentChara) =>
-        {
-            await ConnectDatabase(
-                @"INSERT INTO user_status (id, sp)" +
-                @"VALUES (@id, @sp)" +
-                @"ON CONFLICT (id) DO UPDATE SET sp = user_status.sp + EXCLUDED.sp;",
-                parameters =>
-                {
-                    parameters.AddWithValue("id", currentChara);
-                    parameters.AddWithValue("sp", short.Parse(texts[0]));
-                });
 
-            await ShowResource(currentChara, message);
-        });
+        if (texts.Length < 1)
+        {
+            await message.Channel.SendMessageAsync("引数が変です。");
+            return;
+        }
+
+        await ShowResource(texts[0], message);
     }
 
-    private async Task UpdateSan(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task UpdateMasterRes(string res, SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {
-        var text = content.Substring("?san ".Length);
+        var text = content.Substring($"?master {res} ".Length);
         var texts = text.Split(" ");
-        await Command(texts, 1, message, user, async (currentChara) =>
+        await Command(texts, 13, message, user, async (currentChara) =>
         {
             await ConnectDatabase(
-                @"INSERT INTO user_status (id, san)" +
-                @"VALUES (@id, @hp)" +
-                @"ON CONFLICT (id) DO UPDATE SET san = user_status.san + EXCLUDED.san;",
+                @$"INSERT INTO user_status (id, {res})" +
+                @$"VALUES (@id, @{res})" +
+                @$"ON CONFLICT (id) DO UPDATE SET {res} = user_status.{res} + EXCLUDED.{res};",
                 parameters =>
                 {
-                    parameters.AddWithValue("id", currentChara);
-                    parameters.AddWithValue("san", short.Parse(texts[0]));
-                });
-
-            await ShowResource(currentChara, message);
-        });
-    }
-
-    private async Task UpdateMp(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
-    {
-        var text = content.Substring("?mp ".Length);
-        var texts = text.Split(" ");
-        await Command(texts, 1, message, user, async (currentChara) =>
-        {
-            await ConnectDatabase(
-                @"INSERT INTO user_status (id, mp)" +
-                @"VALUES (@id, @mp)" +
-                @"ON CONFLICT (id) DO UPDATE SET mp = user_status.mp + EXCLUDED.mp;",
-                parameters =>
-                {
-                    parameters.AddWithValue("id", currentChara);
-                    parameters.AddWithValue("mp", short.Parse(texts[0]));
+                    parameters.AddWithValue("id", texts[0]);
+                    parameters.AddWithValue($"{res}", short.Parse(texts[1]));
                 });
 
             await ShowResource(currentChara, message);
@@ -253,7 +231,7 @@ partial class Program
     {
         var text = content.Substring("?set bon ".Length);
         var texts = text.Split(" ");
-        await Command(texts, 10, message, user, async (currentChara) =>
+        await Command(texts, 2222222222, message, user, async (currentChara) =>
         {
             var status = new CharacterStatus();
             status.VitB = float.Parse(texts[0]);
@@ -294,7 +272,7 @@ partial class Program
     {
         var text = content.Substring("?set wep ".Length);
         var texts = text.Split(" ");
-        await Command(texts, 1, message, user, async (currentChara) =>
+        await Command(texts, 3, message, user, async (currentChara) =>
         {
             await ConnectDatabase(
                 @"INSERT INTO user_status (id, wep_p)" +
@@ -379,9 +357,9 @@ partial class Program
         ;
     }
 
-    public async Task Command(string[] texts, int length, SocketMessage message, SocketGuildUser user, Func<string, Task> onCompleted)
+    public async Task Command(string[] texts, long flag, SocketMessage message, SocketGuildUser user, Func<string, Task> onCompleted)
     {
-        if (texts.Length < length)
+        if (!GetPaseFlag(texts, flag))
         {
             await message.Channel.SendMessageAsync("引数が変です。");
             return;

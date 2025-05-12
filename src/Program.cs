@@ -89,19 +89,39 @@ partial class Program
             }
             else if (content.StartsWith("?hp "))
             {
-                await UpdateHp(message, guild, user, content);
+                await UpdateRes("hp", message, guild, user, content);
             }
             else if (content.StartsWith("?sp "))
             {
-                await UpdateSp(message, guild, user, content);
+                await UpdateRes("sp", message, guild, user, content);
             }
             else if (content.StartsWith("?san "))
             {
-                await UpdateSan(message, guild, user, content);
+                await UpdateRes("san", message, guild, user, content);
             }
             else if (content.StartsWith("?mp "))
             {
-                await UpdateMp(message, guild, user, content);
+                await UpdateRes("mp", message, guild, user, content);
+            }
+            else if (content == "?show master res")
+            {
+                await ShowMasterRes(message, guild, user, content);
+            }
+            else if (content.StartsWith("?master hp "))
+            {
+                await UpdateMasterRes("hp", message, guild, user, content);
+            }
+            else if (content.StartsWith("?master sp "))
+            {
+                await UpdateMasterRes("sp", message, guild, user, content);
+            }
+            else if (content.StartsWith("?master san "))
+            {
+                await UpdateMasterRes("san", message, guild, user, content);
+            }
+            else if (content.StartsWith("?master mp "))
+            {
+                await UpdateMasterRes("mp", message, guild, user, content);
             }
             else if (content == "?show bon")
             {
@@ -124,5 +144,30 @@ partial class Program
                 await DiceRoll(message, guild, user, content);
             }
         }
+    }
+
+    private bool GetPaseFlag(string[] texts, long target)
+    {
+        if (texts.Length != target.ToString().Length)
+        {
+            return false;
+        }
+
+        int digit = 1;
+        foreach (string text in texts)
+        {
+            int flag = 0;
+
+            if (int.TryParse(text, out _)) flag = 1;
+            else if (float.TryParse(text, out _)) flag = 2;
+            else flag = 3;
+
+            long num = target % (digit * 10) / digit;
+            if (flag > num) return false;
+
+            digit *= 10;
+        }
+
+        return true;
     }
 }
