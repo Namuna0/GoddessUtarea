@@ -71,52 +71,38 @@ partial class Program
             if (content.StartsWith("?login ")) await Login(message, guild, user, content);
             else if (content.StartsWith("?show data "))  await ShowData(message, guild, user, content);
             else if (content.StartsWith("?set data")) await SetData(message, guild, user, content);
+
             else if (content == "?show res")  await ShowRes(message, guild, user, content);
-            else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user, content);
             else if (content.StartsWith("?set res "))  await SetRes(message, guild, user, content);
-            else if (content.StartsWith("?set npc res "))  await SetNpcRes(message, guild, user, content);
             else if (content.StartsWith("?hp ")) await UpdateRes("hp", message, guild, user, content);
             else if (content.StartsWith("?sp ")) await UpdateRes("sp", message, guild, user, content);
             else if (content.StartsWith("?san ")) await UpdateRes("san", message, guild, user, content);
             else if (content.StartsWith("?mp ")) await UpdateRes("mp", message, guild, user, content);
+            else if (content == "?show bon") await ShowBon(message, guild, user, content);
+            else if (content.StartsWith("?set bon ")) await SetBon(message, guild, user, content);
+            else if (content.StartsWith("?set wep ")) await SetWep(message, guild, user, content);
+
             else if (content == "?show master res") await ShowMasterRes(message, guild, user, content);
             else if (content.StartsWith("?master hp ")) await UpdateMasterRes("hp", message, guild, user, content);
             else if (content.StartsWith("?master sp ")) await UpdateMasterRes("sp", message, guild, user, content);
             else if (content.StartsWith("?master san ")) await UpdateMasterRes("san", message, guild, user, content);
             else if (content.StartsWith("?master mp ")) await UpdateMasterRes("mp", message, guild, user, content);
+
+            else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user, content);
+            else if (content.StartsWith("?set npc res ")) await SetNpcRes(message, guild, user, content);
             else if (content.StartsWith("?npc hp ")) await UpdateNpcHp(message, guild, user, content);
-            else if (content == "?show bon") await ShowBon(message, guild, user, content);
             else if (content.StartsWith("?show npc bon ")) await ShowNpcBon(message, guild, user, content);
-            else if (content.StartsWith("?set bon ")) await SetBon(message, guild, user, content);
             else if (content.StartsWith("?set npc bon ")) await SetNpcBon(message, guild, user, content);
-            else if (content.StartsWith("?set wep ")) await SetWep(message, guild, user, content);
+
             else if (content == "?r") await SimpleRoll(message, guild, user, content);
             else if (content.StartsWith("?r ")) await DiceRoll(message, guild, user, content);
+
+
+            else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user, content);
+            else if (content.StartsWith("?set npc res ")) await SetNpcRes(message, guild, user, content);
+            else if (content.StartsWith("?npc hp ")) await UpdateNpcHp(message, guild, user, content);
+            else if (content.StartsWith("?show npc bon ")) await ShowNpcBon(message, guild, user, content);
+            else if (content.StartsWith("?set npc bon ")) await SetNpcBon(message, guild, user, content);
         }
-    }
-
-    private bool GetPaseFlag(string[] texts, long target)
-    {
-        if (texts.Length != target.ToString().Length)
-        {
-            return false;
-        }
-
-        int digit = 1;
-        foreach (string text in texts)
-        {
-            int flag = 0;
-
-            if (int.TryParse(text, out _)) flag = 1;
-            else if (float.TryParse(text, out _)) flag = 2;
-            else flag = 3;
-
-            long num = target % (digit * 10) / digit;
-            if (flag > num) return false;
-
-            digit *= 10;
-        }
-
-        return true;
     }
 }

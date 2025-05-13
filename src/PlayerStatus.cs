@@ -1,4 +1,6 @@
-﻿partial class Program
+﻿using Discord.WebSocket;
+
+partial class Program
 {
     class PlayerStatus
     {
@@ -6,6 +8,5 @@
         public string CharaName2 { get; set; } = "";
         public string CharaName3 { get; set; } = "";
         public int Destiny { get; set; } = 0;
-
     }
 }
