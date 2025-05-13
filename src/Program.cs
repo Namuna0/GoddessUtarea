@@ -84,6 +84,10 @@ partial class Program
             {
                 await ShowRes(message, guild, user, content);
             }
+            else if (content.StartsWith("?show npc res"))
+            {
+                await ShowNpcRes(message, guild, user, content);
+            }
             else if (content.StartsWith("?set res "))
             {
                 await SetRes(message, guild, user, content);
@@ -128,7 +132,7 @@ partial class Program
             {
                 await UpdateMasterRes("mp", message, guild, user, content);
             }
-            else if (content.StartsWith("?enemy hp "))
+            else if (content.StartsWith("?npc hp "))
             {
                 await UpdateNpcHp(message, guild, user, content);
             }

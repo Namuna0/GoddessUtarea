@@ -133,6 +133,23 @@ partial class Program
         await ShowResource(currentChara, message);
     }
 
+    private async Task ShowNpcRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    {
+        var text = content.Substring("?show npc res ".Length);
+        var texts = text.Split(" ");
+
+        await Command(texts, 3, message, user, async (currentChara) =>
+        {
+            if (!_npcStatus.TryGetValue(texts[0], out var status))
+            {
+                status = new NpcStatus();
+                _npcStatus.Add(texts[0], status);
+            }
+
+            await ShowNpcResource(texts[0], status, message);
+        });
+    }
+
     private async Task SetRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {
         var text = content.Substring("?set res ".Length);
@@ -275,7 +292,7 @@ partial class Program
     {
         var text = content.Substring($"?show npc bon ".Length);
         var texts = text.Split(" ");
-        await Command(texts, 13, message, user, async (currentChara) =>
+        await Command(texts, 3, message, user, async (currentChara) =>
         {
             if (!_npcStatus.TryGetValue(texts[0], out var status))
             {
