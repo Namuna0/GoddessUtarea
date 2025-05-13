@@ -398,7 +398,6 @@ partial class Program
                     "●リソース\r\n" +
                     $"【HP】{reader.GetInt16(4)}/{reader.GetInt16(0)}【SP】{reader.GetInt16(5)}/{reader.GetInt16(1)}\r\n" +
                     $"【SAN】{reader.GetInt16(6)}/{reader.GetInt16(2)}【MP】{reader.GetInt16(7)}/{reader.GetInt16(3)}\r\n" +
-                    $"【防御点】\r\n" +
                     "●状態\r\n" +
                     "●永続状態");
             },
@@ -415,7 +414,6 @@ partial class Program
                 "●リソース\r\n" +
                 $"【HP】{status.Hp}/{status.MaxHp}【SP】{status.Sp}/{status.MaxSp}\r\n" +
                 $"【SAN】{status.San}/{status.MaxSan}【MP】{status.Mp}/{status.MaxMp}\r\n" +
-                $"【防御点】\r\n" +
                 "●状態\r\n" +
                 "●永続状態");
     }
@@ -426,9 +424,7 @@ partial class Program
                 $"{npc}\r\n" +
                 "●リソース\r\n" +
                 $"【HP】{status.Hp}/{status.MaxHp}\r\n" +
-                $"【防御点】\r\n" +
-                "●状態\r\n" +
-                "●永続状態");
+                "●状態\r\n");
     }
 
     private async Task ShowBonus(string currentChara, SocketMessage message)
