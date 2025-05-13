@@ -28,6 +28,13 @@ partial class Program
         public string WepP { get; set; } = "0";
     }
 
+    class NpcStatus
+    {
+        public short MaxHp { get; set; }
+        public short Hp { get; set; }
+        public float AgiB { get; set; }
+    }
+
     private async Task Login(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {
         var text = content.Substring("?login ".Length);
@@ -163,6 +170,25 @@ partial class Program
         });
     }
 
+    private async Task SetNpcRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    {
+        var text = content.Substring("?set npc res ".Length);
+        var texts = text.Split(" ");
+        await Command(texts, 13, message, user, async (currentChara) =>
+        {
+            if (!_npcStatus.TryGetValue(texts[0], out var status))
+            {
+                status = new NpcStatus();
+                _npcStatus.Add(texts[0], status);
+            }
+
+            status.MaxHp = short.Parse(texts[1]);
+            status.Hp = status.MaxHp;
+
+            await ShowNpcResource(texts[0], status, message);
+        });
+    }
+
     private async Task UpdateRes(string res, SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {
         var text = content.Substring($"?{res} ".Length);
@@ -216,6 +242,24 @@ partial class Program
         });
     }
 
+    private async Task UpdateNpcHp(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    {
+        var text = content.Substring($"?npc hp ".Length);
+        var texts = text.Split(" ");
+        await Command(texts, 13, message, user, async (currentChara) =>
+        {
+            if (!_npcStatus.TryGetValue(texts[0], out var status))
+            {
+                status = new NpcStatus();
+                _npcStatus.Add(texts[0], status);
+            }
+
+            status.Hp += short.Parse(texts[1]);
+
+            await ShowNpcResource(texts[0], status, message);
+        });
+    }
+
     private async Task ShowBon(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {
         if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
@@ -225,6 +269,22 @@ partial class Program
         }
 
         await ShowBonus(currentChara, message);
+    }
+
+    private async Task ShowNpcBon(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    {
+        var text = content.Substring($"?show npc bon ".Length);
+        var texts = text.Split(" ");
+        await Command(texts, 13, message, user, async (currentChara) =>
+        {
+            if (!_npcStatus.TryGetValue(texts[0], out var status))
+            {
+                status = new NpcStatus();
+                _npcStatus.Add(texts[0], status);
+            }
+
+            await ShowNpcBonus(texts[0], status, message);
+        });
     }
 
     private async Task SetBon(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
@@ -265,6 +325,24 @@ partial class Program
                 });
 
             await ShowBonus(currentChara, status, message);
+        });
+    }
+
+    private async Task SetNpcBon(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    {
+        var text = content.Substring($"?set npc agi ".Length);
+        var texts = text.Split(" ");
+        await Command(texts, 23, message, user, async (currentChara) =>
+        {
+            if (!_npcStatus.TryGetValue(texts[0], out var status))
+            {
+                status = new NpcStatus();
+                _npcStatus.Add(texts[0], status);
+            }
+
+            status.AgiB = float.Parse(texts[1]);
+
+            await ShowNpcBonus(texts[0], status, message);
         });
     }
 
@@ -325,6 +403,17 @@ partial class Program
                 "●永続状態");
     }
 
+    private async Task ShowNpcResource(string npc, NpcStatus status, SocketMessage message)
+    {
+        await message.Channel.SendMessageAsync(
+                $"{npc}\r\n" +
+                "●リソース\r\n" +
+                $"【HP】{status.Hp}/{status.MaxHp}\r\n" +
+                $"【防御点】\r\n" +
+                "●状態\r\n" +
+                "●永続状態");
+    }
+
     private async Task ShowBonus(string currentChara, SocketMessage message)
     {
         await ConnectDatabase(
@@ -354,6 +443,15 @@ partial class Program
             "●能力値B\r\n" +
             $"{status.VitB.ToString("0.##")} 生命, {status.PowB.ToString("0.##")} 精神, {status.StrB.ToString("0.##")} 筋力, {status.IntB.ToString("0.##")} 知力, {status.MagB.ToString("0.##")} 魔力\r\n" +
             $"{status.DexB.ToString("0.##")} 器用, {status.AgiB.ToString("0.##")} 敏捷, {status.SnsB.ToString("0.##")} 感知, {status.AppB.ToString("0.##")} 魅力, {status.LukB.ToString("0.##")} 幸運");
+        ;
+    }
+
+    private async Task ShowNpcBonus(string npc, NpcStatus status, SocketMessage message)
+    {
+        await message.Channel.SendMessageAsync(
+            $"{npc}\r\n" +
+            "●能力値B\r\n" +
+            $"{status.AgiB.ToString("0.##")} 敏捷");
         ;
     }
 

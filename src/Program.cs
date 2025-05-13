@@ -10,6 +10,7 @@ partial class Program
     private NpgsqlConnection? _connection;
 
     private Dictionary<ulong, string> _currentCharaDic = new Dictionary<ulong, string>();
+    private Dictionary<string, NpcStatus> _npcStatus = new Dictionary<string, NpcStatus>();
 
     private MersenneTwister _ms = new MersenneTwister();
 
@@ -87,6 +88,10 @@ partial class Program
             {
                 await SetRes(message, guild, user, content);
             }
+            else if (content.StartsWith("?set npc res "))
+            {
+                await SetNpcRes(message, guild, user, content);
+            }
             else if (content.StartsWith("?hp "))
             {
                 await UpdateRes("hp", message, guild, user, content);
@@ -123,13 +128,25 @@ partial class Program
             {
                 await UpdateMasterRes("mp", message, guild, user, content);
             }
+            else if (content.StartsWith("?enemy hp "))
+            {
+                await UpdateNpcHp(message, guild, user, content);
+            }
             else if (content == "?show bon")
             {
                 await ShowBon(message, guild, user, content);
             }
+            else if (content.StartsWith("?show npc bon "))
+            {
+                await ShowNpcBon(message, guild, user, content);
+            }
             else if (content.StartsWith("?set bon "))
             {
                 await SetBon(message, guild, user, content);
+            }
+            else if (content.StartsWith("?set npc bon "))
+            {
+                await SetNpcBon(message, guild, user, content);
             }
             else if (content.StartsWith("?set wep "))
             {
