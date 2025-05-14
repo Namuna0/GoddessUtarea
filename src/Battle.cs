@@ -22,7 +22,7 @@ partial class Program
                 _npcStatus.Add(texts[0], status);
             }
 
-            await ShowNpcResource(texts[0], status, message);
+            await DisplayNpcResource(texts[0], status, message);
         });
     }
 
@@ -41,7 +41,7 @@ partial class Program
             status.MaxHp = short.Parse(texts[1]);
             status.Hp = status.MaxHp;
 
-            await ShowNpcResource(texts[0], status, message);
+            await DisplayNpcResource(texts[0], status, message);
         });
     }
 
@@ -59,7 +59,7 @@ partial class Program
 
             status.Hp += short.Parse(texts[1]);
 
-            await ShowNpcResource(texts[0], status, message);
+            await DisplayNpcResource(texts[0], status, message);
         });
     }
 
@@ -75,7 +75,7 @@ partial class Program
                 _npcStatus.Add(texts[0], status);
             }
 
-            await ShowNpcBonus(texts[0], status, message);
+            await DisplayNpcBonus(texts[0], status, message);
         });
     }
 
@@ -93,11 +93,41 @@ partial class Program
 
             status.AgiB = float.Parse(texts[1]);
 
-            await ShowNpcBonus(texts[0], status, message);
+            await DisplayNpcBonus(texts[0], status, message);
         });
     }
 
-    private async Task ShowNpcResource(string npc, NpcStatus status, SocketMessage message)
+    private async Task NpcDiceRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    {
+        var text = content.Substring("?npc r ".Length);
+        var texts = text.Split(" ");
+
+        if (!GetPaseFlag(texts, 33) && !GetPaseFlag(texts, 333))
+        {
+            await message.Channel.SendMessageAsync("引数が変です。");
+            return;
+        }
+
+        if (!_npcStatus.TryGetValue(texts[0], out var status))
+        {
+            status = new NpcStatus();
+            _npcStatus.Add(texts[0], status);
+        }
+
+        CalcFormula(texts[0], status, out string culcResult, out string showResult);
+
+        string comment = string.Empty;
+        if (texts.Length > 1)
+        {
+            comment = $"：{texts[2]}";
+        }
+
+        await message.Channel.SendMessageAsync(
+        $"<@{user.Id}> :game_die:{texts[0]}\r\n" +
+        $"{showResult}=>{culcResult}");
+    }
+
+    private async Task DisplayNpcResource(string npc, NpcStatus status, SocketMessage message)
     {
         await message.Channel.SendMessageAsync(
                 $"{npc}\r\n" +
@@ -106,12 +136,37 @@ partial class Program
                 "●状態\r\n");
     }
 
-    private async Task ShowNpcBonus(string npc, NpcStatus status, SocketMessage message)
+    private async Task DisplayNpcBonus(string npc, NpcStatus status, SocketMessage message)
     {
         await message.Channel.SendMessageAsync(
             $"{npc}\r\n" +
             "●能力値B\r\n" +
             $"{status.AgiB.ToString("0.##")} 敏捷");
         ;
+    }
+
+    private void CalcFormula(string originalText, NpcStatus status, out string culcResult, out string showResult)
+    {
+        string culcText = originalText;
+        string showText = originalText;
+
+        if (status != null)
+        {
+            ReplaceBonus("[敏捷B]", status.AgiB, ref culcText, ref showText);
+        }
+
+        CalcDice(ref culcText, ref showText);
+
+        if (status != null)
+        {
+            CalcBonusDice("敏捷R", status.AgiB, ref culcText, ref showText);
+        }
+
+        var expr = new NCalc.Expression(culcText);
+
+        showText = showText.Replace("*", @"\*");
+
+        culcResult = float.Parse(expr.Evaluate()?.ToString() ?? "0").ToString("0.##");
+        showResult = showText;
     }
 }

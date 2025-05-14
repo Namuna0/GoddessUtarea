@@ -59,61 +59,6 @@ partial class Program
         $"{showResult}=>{culcResult}");
     }
 
-    private async Task DiceRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
-    {
-        var text = content.Substring("?r ".Length);
-        var texts = text.Split(" ");
-
-        if (!GetPaseFlag(texts, 3) && !GetPaseFlag(texts, 33))
-        {
-            await message.Channel.SendMessageAsync("引数が変です。");
-            return;
-        }
-
-        if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
-        {
-            await message.Channel.SendMessageAsync("「?login [キャラクター名]」を呼んでください。");
-            return;
-        }
-
-        await ConnectDatabase(
-            @"SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b, wep_p FROM user_status WHERE id = @id",
-            parameters =>
-            {
-                parameters.AddWithValue("id", currentChara);
-            },
-            async (reader) =>
-            {
-                var status = new CharacterStatus();
-                status.VitB = reader.GetFloat(0);
-                status.PowB = reader.GetFloat(1);
-                status.StrB = reader.GetFloat(2);
-                status.IntB = reader.GetFloat(3);
-                status.MagB = reader.GetFloat(4);
-                status.DexB = reader.GetFloat(5);
-                status.AgiB = reader.GetFloat(6);
-                status.SnsB = reader.GetFloat(7);
-                status.AppB = reader.GetFloat(8);
-                status.LukB = reader.GetFloat(9);
-                status.WepP = reader.GetString(10);
-
-                CalcFormula(texts[0], status, out string culcResult, out string showResult);
-
-                string comment = string.Empty;
-                if (texts.Length > 1)
-                {
-                    comment = $"：{texts[1]}";
-                }
-
-                await message.Channel.SendMessageAsync(
-                $"<@{user.Id}> :game_die:{currentChara}\r\n" +
-                $"{showResult}=>{culcResult}");
-            },
-            async () =>
-            {
-                await message.Channel.SendMessageAsync("キャラクターが見つかりませんでした。");
-            });
-    }
 
     private async Task ShowRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
     {

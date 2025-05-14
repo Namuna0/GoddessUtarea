@@ -97,12 +97,13 @@ partial class Program
             else if (content == "?r") await SimpleRoll(message, guild, user, content);
             else if (content.StartsWith("?r ")) await DiceRoll(message, guild, user, content);
 
-
             else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user, content);
             else if (content.StartsWith("?set npc res ")) await SetNpcRes(message, guild, user, content);
             else if (content.StartsWith("?npc hp ")) await UpdateNpcHp(message, guild, user, content);
             else if (content.StartsWith("?show npc bon ")) await ShowNpcBon(message, guild, user, content);
             else if (content.StartsWith("?set npc bon ")) await SetNpcBon(message, guild, user, content);
+            else if (content.StartsWith("?npc r ")) await NpcDiceRoll(message, guild, user, content);
+
         }
     }
 }
