@@ -117,7 +117,7 @@ partial class Program
         NpcCalcFormula(texts[1], status, out string culcResult, out string showResult);
 
         string comment = string.Empty;
-        if (texts.Length > 1)
+        if (texts.Length > 2)
         {
             comment = $"：{texts[2]}";
         }
