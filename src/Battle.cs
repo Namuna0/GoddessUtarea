@@ -114,7 +114,7 @@ partial class Program
             _npcStatus.Add(texts[0], status);
         }
 
-        CalcFormula(texts[0], status, out string culcResult, out string showResult);
+        NpcCalcFormula(texts[0], status, out string culcResult, out string showResult);
 
         string comment = string.Empty;
         if (texts.Length > 1)
@@ -145,7 +145,7 @@ partial class Program
         ;
     }
 
-    private void CalcFormula(string originalText, NpcStatus status, out string culcResult, out string showResult)
+    private void NpcCalcFormula(string originalText, NpcStatus status, out string culcResult, out string showResult)
     {
         string culcText = originalText;
         string showText = originalText;
