@@ -106,7 +106,7 @@ partial class Program
                 }
 
                 await message.Channel.SendMessageAsync(
-                $"<@{user.Id}> :game_die:{currentChara}\r\n" +
+                $"<@{user.Id}> :game_die:{currentChara}{comment}\r\n" +
                 $"{showResult}=>{culcResult}");
             },
             async () =>

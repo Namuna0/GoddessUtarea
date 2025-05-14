@@ -102,7 +102,7 @@ partial class Program
         var text = content.Substring("?npc r ".Length);
         var texts = text.Split(" ");
 
-        if (!GetPaseFlag(texts, 3) && !GetPaseFlag(texts, 33))
+        if (!GetPaseFlag(texts, 33) && !GetPaseFlag(texts, 333))
         {
             await message.Channel.SendMessageAsync("引数が変です。");
             return;
@@ -114,16 +114,16 @@ partial class Program
             _npcStatus.Add(texts[0], status);
         }
 
-        NpcCalcFormula(texts[0], status, out string culcResult, out string showResult);
+        NpcCalcFormula(texts[1], status, out string culcResult, out string showResult);
 
         string comment = string.Empty;
         if (texts.Length > 1)
         {
-            comment = $"：{texts[1]}";
+            comment = $"：{texts[2]}";
         }
 
         await message.Channel.SendMessageAsync(
-        $"<@{user.Id}> :game_die:{texts[0]}\r\n" +
+        $"<@{user.Id}> :game_die:{texts[0]}{comment}\r\n" +
         $"{showResult}=>{culcResult}");
     }
 
