@@ -102,7 +102,7 @@ partial class Program
         var text = content.Substring("?npc r ".Length);
         var texts = text.Split(" ");
 
-        if (!GetPaseFlag(texts, 33) && !GetPaseFlag(texts, 333))
+        if (!GetPaseFlag(texts, 3) && !GetPaseFlag(texts, 33))
         {
             await message.Channel.SendMessageAsync("引数が変です。");
             return;
@@ -119,7 +119,7 @@ partial class Program
         string comment = string.Empty;
         if (texts.Length > 1)
         {
-            comment = $"：{texts[2]}";
+            comment = $"：{texts[1]}";
         }
 
         await message.Channel.SendMessageAsync(
