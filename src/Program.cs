@@ -104,6 +104,7 @@ partial class Program
             else if (content.StartsWith("?set npc bon ")) await SetNpcBon(message, guild, user, content);
             else if (content.StartsWith("?npc r ")) await NpcDiceRoll(message, guild, user, content);
 
+            else if (content.StartsWith("?add stg ")) await AddStg(message, guild, user, content);
         }
     }
 }

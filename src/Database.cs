@@ -1,5 +1,8 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
+using MathNet.Numerics;
 using Npgsql;
+using static System.Net.Mime.MediaTypeNames;
 
 partial class Program
 {
@@ -104,30 +107,10 @@ partial class Program
 
     private void Create()
     {
-        var createSql = @"CREATE TABLE IF NOT EXISTS user_status (
-id TEXT PRIMARY KEY,
-copper_coin SMALLINT DEFAULT 0,
-silver_coin SMALLINT DEFAULT 0,
-gold_coin SMALLINT DEFAULT 0,
-holly_coin SMALLINT DEFAULT 0,
-equipment SMALLINT DEFAULT 0,
-max_mp SMALLINT DEFAULT 0,
-hp SMALLINT DEFAULT 0,
-sp  SMALLINT DEFAULT 0,
-san SMALLINT DEFAULT 0,
-mp SMALLINT DEFAULT 0,
-vit_b REAL DEFAULT 0.0,
-pow_b REAL DEFAULT 0.0,
-str_b REAL DEFAULT 0.0,
-int_b REAL DEFAULT 0.0,
-mag_b REAL DEFAULT 0.0,
-dex_b REAL DEFAULT 0.0,
-agi_b REAL DEFAULT 0.0,
-sns_b REAL DEFAULT 0.0,
-app_b REAL DEFAULT 0.0,
-luk_b REAL DEFAULT 0.0,
-wep_p TEXT DEFAULT '0',
-created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
+
+        var createSql = @"CREATE TABLE IF NOT EXISTS user_storage (
+storage_data JSONB
+id TEXT PRIMARY KEY);";
 
     }
 }
