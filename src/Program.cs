@@ -68,43 +68,43 @@ partial class Program
             var user = guild.GetUser(message.Author.Id);
             var content = message.Content;
 
-            if (content.StartsWith("?login ")) await Login(message, guild, user, content);
-            else if (content.StartsWith("?show data "))  await ShowData(message, guild, user, content);
-            else if (content.StartsWith("?set data")) await SetData(message, guild, user, content);
+            if (content.StartsWith("?login ")) await Login(message, guild, user);
+            else if (content.StartsWith("?show data ")) await ShowData(message, guild, user);
+            else if (content.StartsWith("?set data")) await SetData(message, guild, user);
 
-            else if (content == "?show res")  await ShowRes(message, guild, user, content);
-            else if (content.StartsWith("?set res "))  await SetRes(message, guild, user, content);
-            else if (content.StartsWith("?hp ")) await UpdateRes("hp", message, guild, user, content);
-            else if (content.StartsWith("?sp ")) await UpdateRes("sp", message, guild, user, content);
-            else if (content.StartsWith("?san ")) await UpdateRes("san", message, guild, user, content);
-            else if (content.StartsWith("?mp ")) await UpdateRes("mp", message, guild, user, content);
-            else if (content == "?show bon") await ShowBon(message, guild, user, content);
-            else if (content.StartsWith("?set bon ")) await SetBon(message, guild, user, content);
-            else if (content.StartsWith("?set wep ")) await SetWep(message, guild, user, content);
+            else if (content == "?show res") await ShowRes(message, guild, user);
+            else if (content.StartsWith("?set res ")) await SetRes(message, guild, user);
+            else if (content.StartsWith("?hp ")) await UpdateRes("hp", message, guild, user);
+            else if (content.StartsWith("?sp ")) await UpdateRes("sp", message, guild, user);
+            else if (content.StartsWith("?san ")) await UpdateRes("san", message, guild, user);
+            else if (content.StartsWith("?mp ")) await UpdateRes("mp", message, guild, user);
+            else if (content == "?show bon") await ShowBon(message, guild, user);
+            else if (content.StartsWith("?set bon ")) await SetBon(message, guild, user);
+            else if (content.StartsWith("?set wep ")) await SetWep(message, guild, user);
 
-            else if (content == "?show master res") await ShowMasterRes(message, guild, user, content);
-            else if (content.StartsWith("?master hp ")) await UpdateMasterRes("hp", message, guild, user, content);
-            else if (content.StartsWith("?master sp ")) await UpdateMasterRes("sp", message, guild, user, content);
-            else if (content.StartsWith("?master san ")) await UpdateMasterRes("san", message, guild, user, content);
-            else if (content.StartsWith("?master mp ")) await UpdateMasterRes("mp", message, guild, user, content);
+            else if (content == "?show master res") await ShowMasterRes(message, guild, user);
+            else if (content.StartsWith("?master hp ")) await UpdateMasterRes("hp", message, guild, user);
+            else if (content.StartsWith("?master sp ")) await UpdateMasterRes("sp", message, guild, user);
+            else if (content.StartsWith("?master san ")) await UpdateMasterRes("san", message, guild, user);
+            else if (content.StartsWith("?master mp ")) await UpdateMasterRes("mp", message, guild, user);
 
-            else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user, content);
-            else if (content.StartsWith("?set npc res ")) await SetNpcRes(message, guild, user, content);
-            else if (content.StartsWith("?npc hp ")) await UpdateNpcHp(message, guild, user, content);
-            else if (content.StartsWith("?show npc bon ")) await ShowNpcBon(message, guild, user, content);
-            else if (content.StartsWith("?set npc bon ")) await SetNpcBon(message, guild, user, content);
+            else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user);
+            else if (content.StartsWith("?set npc res ")) await SetNpcRes(message, guild, user);
+            else if (content.StartsWith("?npc hp ")) await UpdateNpcHp(message, guild, user);
+            else if (content.StartsWith("?show npc bon ")) await ShowNpcBon(message, guild, user);
+            else if (content.StartsWith("?set npc bon ")) await SetNpcBon(message, guild, user);
 
-            else if (content == "?r") await SimpleRoll(message, guild, user, content);
-            else if (content.StartsWith("?r ")) await DiceRoll(message, guild, user, content);
+            else if (content == "?r") await SimpleRoll(message, guild, user);
+            else if (content.StartsWith("?r ")) await DiceRoll(message, guild, user);
 
-            else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user, content);
-            else if (content.StartsWith("?set npc res ")) await SetNpcRes(message, guild, user, content);
-            else if (content.StartsWith("?npc hp ")) await UpdateNpcHp(message, guild, user, content);
-            else if (content.StartsWith("?show npc bon ")) await ShowNpcBon(message, guild, user, content);
-            else if (content.StartsWith("?set npc bon ")) await SetNpcBon(message, guild, user, content);
-            else if (content.StartsWith("?npc r ")) await NpcDiceRoll(message, guild, user, content);
+            else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user);
+            else if (content.StartsWith("?set npc res ")) await SetNpcRes(message, guild, user);
+            else if (content.StartsWith("?npc hp ")) await UpdateNpcHp(message, guild, user);
+            else if (content.StartsWith("?show npc bon ")) await ShowNpcBon(message, guild, user);
+            else if (content.StartsWith("?set npc bon ")) await SetNpcBon(message, guild, user);
+            else if (content.StartsWith("?npc r ")) await NpcDiceRoll(message, guild, user);
 
-            else if (content.StartsWith("?add stg ")) await AddStg(message, guild, user, content);
+            else if (content.StartsWith("?add stg ")) await AddStg(message, guild, user);
         }
     }
 }

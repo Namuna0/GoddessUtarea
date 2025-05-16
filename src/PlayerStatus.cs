@@ -1,6 +1,4 @@
-﻿using Discord.WebSocket;
-
-partial class Program
+﻿partial class Program
 {
     class PlayerStatus
     {

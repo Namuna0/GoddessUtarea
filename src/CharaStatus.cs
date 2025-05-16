@@ -28,9 +28,9 @@ partial class Program
         public string WepP { get; set; } = "0";
     }
 
-    private async Task Login(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task Login(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring("?login ".Length);
+        var text = message.Content.Substring("?login ".Length);
         var texts = text.Split(" ");
 
         if (!GetPaseFlag(texts, 3))
@@ -44,7 +44,7 @@ partial class Program
         await message.Channel.SendMessageAsync($"こんにちは、{texts[0]}さん！");
     }
 
-    private async Task SimpleRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task SimpleRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
         if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
         {
@@ -59,9 +59,9 @@ partial class Program
         $"{showResult}=>{culcResult}");
     }
 
-    private async Task DiceRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task DiceRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring("?r ".Length);
+        var text = message.Content.Substring("?r ".Length);
         var texts = text.Split(" ");
 
         if (!GetPaseFlag(texts, 3) && !GetPaseFlag(texts, 33))
@@ -115,7 +115,7 @@ partial class Program
             });
     }
 
-    private async Task ShowRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task ShowRes(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
         if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
         {
@@ -126,9 +126,9 @@ partial class Program
         await DisplayResource(currentChara, message);
     }
 
-    private async Task SetRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task SetRes(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring("?set res ".Length);
+        var text = message.Content.Substring("?set res ".Length);
         var texts = text.Split(" ");
         await Command(texts, 1111, message, user, async (currentChara) =>
         {
@@ -163,9 +163,9 @@ partial class Program
         });
     }
 
-    private async Task UpdateRes(string res, SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task UpdateRes(string res, SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring($"?{res} ".Length);
+        var text = message.Content.Substring($"?{res} ".Length);
         var texts = text.Split(" ");
         await Command(texts, 1, message, user, async (currentChara) =>
         {
@@ -183,7 +183,7 @@ partial class Program
         });
     }
 
-    private async Task ShowBon(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task ShowBon(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
         if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
         {
@@ -194,9 +194,9 @@ partial class Program
         await DisplayBonus(currentChara, message);
     }
 
-    private async Task SetBon(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task SetBon(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring("?set bon ".Length);
+        var text = message.Content.Substring("?set bon ".Length);
         var texts = text.Split(" ");
         await Command(texts, 2222222222, message, user, async (currentChara) =>
         {
@@ -235,9 +235,9 @@ partial class Program
         });
     }
 
-    private async Task SetWep(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task SetWep(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring("?set wep ".Length);
+        var text = message.Content.Substring("?set wep ".Length);
         var texts = text.Split(" ");
         await Command(texts, 3, message, user, async (currentChara) =>
         {
@@ -255,9 +255,9 @@ partial class Program
         });
     }
 
-    private async Task ShowMasterRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task ShowMasterRes(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring($"?show master res ".Length);
+        var text = message.Content.Substring($"?show master res ".Length);
         var texts = text.Split(" ");
 
         if (texts.Length < 1)
@@ -269,9 +269,9 @@ partial class Program
         await DisplayResource(texts[0], message);
     }
 
-    private async Task UpdateMasterRes(string res, SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task UpdateMasterRes(string res, SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring($"?master {res} ".Length);
+        var text = message.Content.Substring($"?master {res} ".Length);
         var texts = text.Split(" ");
         await Command(texts, 13, message, user, async (currentChara) =>
         {

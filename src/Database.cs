@@ -1,8 +1,5 @@
-﻿using Discord;
-using Discord.WebSocket;
-using MathNet.Numerics;
+﻿using Discord.WebSocket;
 using Npgsql;
-using static System.Net.Mime.MediaTypeNames;
 
 partial class Program
 {
@@ -53,9 +50,9 @@ partial class Program
         }
     }
 
-    private async Task ShowData(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task ShowData(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring("?show data ".Length);
+        var text = message.Content.Substring("?show data ".Length);
         var texts = text.Split(" ");
 
         if (texts.Length < 1)
@@ -80,9 +77,9 @@ partial class Program
             });
     }
 
-    private async Task SetData(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task SetData(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring("?set data ".Length);
+        var text = message.Content.Substring("?set data ".Length);
         var texts = text.Split(" ");
         var mainText = text.Substring(texts[0].Length + 1);
 
@@ -105,12 +102,12 @@ partial class Program
         await message.Channel.SendMessageAsync($"```{mainText}```");
     }
 
-    private void Create()
+    private async Task Create()
     {
 
-        var createSql = @"CREATE TABLE IF NOT EXISTS user_storage (
-storage_data JSONB
-id TEXT PRIMARY KEY);";
+        var createSql = @"DROP TABLE user_storage;";
+
+        await ConnectDatabase(createSql);
 
     }
 }

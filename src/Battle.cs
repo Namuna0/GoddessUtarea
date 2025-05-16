@@ -9,9 +9,9 @@ partial class Program
         public float AgiB { get; set; }
     }
 
-    private async Task ShowNpcRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task ShowNpcRes(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring("?show npc res ".Length);
+        var text = message.Content.Substring("?show npc res ".Length);
         var texts = text.Split(" ");
 
         await Command(texts, 3, message, user, async (currentChara) =>
@@ -26,9 +26,9 @@ partial class Program
         });
     }
 
-    private async Task SetNpcRes(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task SetNpcRes(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring("?set npc res ".Length);
+        var text = message.Content.Substring("?set npc res ".Length);
         var texts = text.Split(" ");
         await Command(texts, 13, message, user, async (currentChara) =>
         {
@@ -45,9 +45,9 @@ partial class Program
         });
     }
 
-    private async Task UpdateNpcHp(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task UpdateNpcHp(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring($"?npc hp ".Length);
+        var text = message.Content.Substring($"?npc hp ".Length);
         var texts = text.Split(" ");
         await Command(texts, 13, message, user, async (currentChara) =>
         {
@@ -63,9 +63,9 @@ partial class Program
         });
     }
 
-    private async Task ShowNpcBon(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task ShowNpcBon(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring($"?show npc bon ".Length);
+        var text = message.Content.Substring($"?show npc bon ".Length);
         var texts = text.Split(" ");
         await Command(texts, 3, message, user, async (currentChara) =>
         {
@@ -79,9 +79,9 @@ partial class Program
         });
     }
 
-    private async Task SetNpcBon(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task SetNpcBon(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring($"?set npc agi ".Length);
+        var text = message.Content.Substring($"?set npc agi ".Length);
         var texts = text.Split(" ");
         await Command(texts, 23, message, user, async (currentChara) =>
         {
@@ -97,9 +97,9 @@ partial class Program
         });
     }
 
-    private async Task NpcDiceRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user, string content)
+    private async Task NpcDiceRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = content.Substring("?npc r ".Length);
+        var text = message.Content.Substring("?npc r ".Length);
         var texts = text.Split(" ");
 
         if (!GetPaseFlag(texts, 33) && !GetPaseFlag(texts, 333))
