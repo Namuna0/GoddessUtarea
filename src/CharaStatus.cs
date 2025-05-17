@@ -380,7 +380,7 @@ partial class Program
             return false;
         }
 
-        int digit = 1;
+        long digit = 1;
         foreach (string text in texts)
         {
             int flag = 0;
