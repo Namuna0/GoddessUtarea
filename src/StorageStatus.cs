@@ -2,24 +2,9 @@
 
 partial class Program
 {
-    class StorageStatus
+    private async Task UpdateStg(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        public int CopperCoin { get; set; } = 0;
-        public int SilverCoin { get; set; } = 0;
-        public int GoldCoin { get; set; } = 0;
-        public int HollySilverCoin { get; set; } = 0;
-
-        public Dictionary<string, int> EquipmentList { get; set; } = new Dictionary<string, int>();
-        public Dictionary<string, int> ValuableList { get; set; } = new Dictionary<string, int>();
-        public Dictionary<string, int> RecipeList { get; set; } = new Dictionary<string, int>();
-        public Dictionary<string, int> ToolList { get; set; } = new Dictionary<string, int>();
-        public Dictionary<string, int> MaterialList { get; set; } = new Dictionary<string, int>();
-        public Dictionary<string, int> FarmList { get; set; } = new Dictionary<string, int>();
-    }
-
-    private async Task AddStg(SocketMessage message, SocketGuild guild, SocketGuildUser user)
-    {
-        var text = message.Content.Substring("?add stg ".Length);
+        var text = message.Content.Substring("?stg ".Length);
         var texts = text.Split(" ");
         await Command(texts, 133, message, user, async (currentChara) =>
         {
@@ -30,7 +15,6 @@ partial class Program
             else if (texts[0] == "道具") listName = "tool_list";
             else if (texts[0] == "素材") listName = "material_list";
             else if (texts[0] == "農業") listName = "farm_list";
-
 
             switch (texts[0])
             {
@@ -60,7 +44,7 @@ partial class Program
             }
 
             await ConnectDatabase(@$"
-INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_silver_coin, equipment_list, valuable_list, recipe_list, tool_list, material_list, farm_list)
+INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin, equipment_list, valuable_list, recipe_list, tool_list, material_list, farm_list)
 VALUES (
     @id,
     0, 0, 0, 0,
@@ -91,6 +75,62 @@ DO UPDATE SET {listName} =
         });
     }
 
+    private async Task UpdateCoin(string type, SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    {
+        var text = message.Content.Substring($"?{type} ".Length);
+        var texts = text.Split(" ");
+
+        await Command(texts, 1, message, user, async (currentChara) =>
+        {
+            await ConnectDatabase($@"
+INSERT INTO user_storage (id, {type})
+VALUES (@id, @{type})
+ON CONFLICT (id) DO UPDATE
+SET {type} = user_storage.{type} + EXCLUDED.{type};",
+            parameters =>
+            {
+                parameters.AddWithValue("id", currentChara);
+                parameters.AddWithValue($"{type}", short.Parse(texts[0]));
+            });
+
+            await DisplayStorage(currentChara, message);
+        });
+    }
+
+    private async Task UpdateCoin(SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    {
+        var text = message.Content.Substring($"?coin ".Length);
+        var texts = text.Split(" ");
+
+        await Command(texts, 1, message, user, async (currentChara) =>
+        {
+            int coin = short.Parse(texts[0]);
+            int copperCoin = coin % 12;
+            int silverCoin = coin % 144 / 12;
+            int goldCoin = coin % 1728 / 144;
+            int hollyCoin = coin / 1728;
+
+            await ConnectDatabase($@"
+INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin)
+VALUES (@id, @copper_coin, @silver_coin, @gold_coin, @holly_coin)
+ON CONFLICT (id) DO UPDATE
+SET copper_coin = user_storage.copper_coin + EXCLUDED.copper_coin,
+silver_coin = user_storage.silver_coin + EXCLUDED.silver_coin,
+gold_coin = user_storage.gold_coin + EXCLUDED.gold_coin,
+holly_coin = user_storage.holly_coin + EXCLUDED.holly_coin;",
+            parameters =>
+            {
+                parameters.AddWithValue("id", currentChara);
+                parameters.AddWithValue("copper_coin", copperCoin);
+                parameters.AddWithValue("silver_coin", silverCoin);
+                parameters.AddWithValue("gold_coin", goldCoin);
+                parameters.AddWithValue("holly_coin", hollyCoin);
+            });
+
+            await DisplayStorage(currentChara, message);
+        });
+    }
+
     private async Task ShowStg(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
         if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
@@ -114,77 +154,58 @@ DO UPDATE SET {listName} =
                 var copper_coin = reader.GetInt16(reader.GetOrdinal("copper_coin"));
                 var silver_coin = reader.GetInt16(reader.GetOrdinal("silver_coin"));
                 var gold_coin = reader.GetInt16(reader.GetOrdinal("gold_coin"));
-                var holly_silver_coin = reader.GetInt16(reader.GetOrdinal("holly_silver_coin"));
+                var holly_coin = reader.GetInt16(reader.GetOrdinal("holly_coin"));
                 var b = reader.GetFieldValue<string>(reader.GetOrdinal("farm_list"));
 
                 var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("equipment_list")));
                 var equipment_list = string.Join(", ", dict.Select(kv => $"{kv.Key}×{kv.Value}"));
+                if (equipment_list.Length > 0) equipment_list += "\r\n";
 
                 dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("valuable_list")));
                 var valuable_list = string.Join(", ", dict.Select(kv => $"{kv.Key}×{kv.Value}"));
+                if (valuable_list.Length > 0) valuable_list += "\r\n";
 
                 dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("recipe_list")));
                 var recipe_list = string.Join(", ", dict.Select(kv => $"{kv.Key}×{kv.Value}"));
+                if (recipe_list.Length > 0) recipe_list += "\r\n";
 
                 dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("tool_list")));
                 var tool_list = string.Join(", ", dict.Select(kv => $"{kv.Key}×{kv.Value}"));
+                if (tool_list.Length > 0) tool_list += "\r\n";
 
                 dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("material_list")));
                 var material_list = string.Join(", ", dict.Select(kv => $"{kv.Key}×{kv.Value}"));
+                if (material_list.Length > 0) material_list += "\r\n";
 
                 dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("farm_list")));
                 var farm_list = string.Join(", ", dict.Select(kv => $"{kv.Key}×{kv.Value}"));
+                if (farm_list.Length > 0) farm_list += "\r\n";
 
                 await message.Channel.SendMessageAsync(
                     "```\r\n" +
                     $"【キャラクター】{currentChara}\r\n" +
-                    $"【所持金】{holly_silver_coin * 1728 + gold_coin * 144 + silver_coin * 12 + copper_coin}ジルダ\r\n" +
+                    $"【所持金】{holly_coin * 1728 + gold_coin * 144 + silver_coin * 12 + copper_coin}ジルダ\r\n" +
                     $"《ジルダ銅貨》×{copper_coin}\r\n" +
                     $"《ジルダ銀貨》×{silver_coin}\r\n" +
                     $"《ジルダ金貨》×{gold_coin}\r\n" +
-                    $"《ジルダ聖銀貨》×{holly_silver_coin}\r\n" +
+                    $"《ジルダ聖銀貨》×{holly_coin}\r\n" +
                     "●装備\r\n" +
-                    $"{equipment_list}\r\n" +
+                    $"{equipment_list}" +
                     "●貴重品\r\n" +
-                    $"{valuable_list}\r\n" +
+                    $"{valuable_list}" +
                     "●レシピ\r\n" +
-                    $"{recipe_list}\r\n" +
+                    $"{recipe_list}" +
                     "●道具\r\n" +
-                    $"{tool_list}\r\n" +
+                    $"{tool_list}" +
                     "●素材\r\n" +
-                    $"{material_list}\r\n" +
+                    $"{material_list}" +
                     "●農業\r\n" +
-                    $"{farm_list}\r\n" +
+                    $"{farm_list}" +
                     "```");
             },
             async () =>
             {
                 await message.Channel.SendMessageAsync("キャラクターが見つかりませんでした。");
             });
-    }
-
-    private async Task DisplayStorage(string currentChara, StorageStatus status, SocketMessage message)
-    {
-        await message.Channel.SendMessageAsync(
-            "```\r\n" +
-            $"【キャラクター】{currentChara}\r\n" +
-            $"【所持金】{status.HollySilverCoin * 1728 + status.GoldCoin * 144 + status.SilverCoin * 12 + status.CopperCoin}ジルダ\r\n" +
-            $"《ジルダ銅貨》×{status.CopperCoin}\r\n" +
-            $"《ジルダ銀貨》×{status.SilverCoin}\r\n" +
-            $"《ジルダ金貨》×{status.GoldCoin}\r\n" +
-            $"《ジルダ聖銀貨》×{status.HollySilverCoin}\r\n" +
-            "●装備\r\n" +
-            $"{0}\r\n" +
-            "●貴重品\r\n" +
-            $"{0}" +
-            "●レシピ\r\n" +
-            $"{0}\r\n" +
-            "●道具\r\n" +
-            $"{0}\r\n" +
-            "●素材\r\n" +
-            $"{0}\r\n" +
-            "●農業\r\n" +
-            $"{0}\r\n" +
-            "```");
     }
 }

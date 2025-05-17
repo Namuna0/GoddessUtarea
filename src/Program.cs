@@ -97,7 +97,12 @@ partial class Program
             else if (content.StartsWith("?set npc bon ")) await SetNpcBon(message, guild, user);
             else if (content.StartsWith("?npc r ")) await NpcDiceRoll(message, guild, user);
 
-            else if (content.StartsWith("?add stg ")) await AddStg(message, guild, user);
+            else if (content.StartsWith("?stg ")) await UpdateStg(message, guild, user);
+            else if (content.StartsWith("?copper_coin ")) await UpdateCoin("copper_coin", message, guild, user);
+            else if (content.StartsWith("?silver_coin ")) await UpdateCoin("silver_coin", message, guild, user);
+            else if (content.StartsWith("?gold_coin ")) await UpdateCoin("gold_coin", message, guild, user);
+            else if (content.StartsWith("?holly_coin ")) await UpdateCoin("holly_coin", message, guild, user);
+            else if (content.StartsWith("?coin ")) await UpdateCoin(message, guild, user);
             else if (content == "?show stg") await ShowStg(message, guild, user);
         }
     }
