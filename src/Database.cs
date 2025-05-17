@@ -104,8 +104,23 @@ partial class Program
 
     private async Task Create()
     {
+        //        var createSql = @"DROP TABLE IF EXISTS user_storage CASCADE;
 
-        var createSql = @"DROP TABLE user_storage;";
+        var createSql = @"
+CREATE TABLE user_storage (
+  id TEXT PRIMARY KEY,
+  copper_coin INT DEFAULT 0,
+  silver_coin INT DEFAULT 0,
+  gold_coin INT DEFAULT 0,
+  holly_silver_coin INT DEFAULT 0,
+  equipment_list JSONB DEFAULT '{}',
+  valuable_list JSONB DEFAULT '{}',
+  recipe_list JSONB DEFAULT '{}',
+  tool_list JSONB DEFAULT '{}',
+  material_list JSONB DEFAULT '{}',
+  farm_list JSONB DEFAULT '{}'
+);
+";
 
         await ConnectDatabase(createSql);
 

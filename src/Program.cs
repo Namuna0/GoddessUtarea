@@ -7,7 +7,6 @@ using Npgsql;
 partial class Program
 {
     private DiscordSocketClient? _client;
-    private NpgsqlConnection? _connection;
 
     private Dictionary<ulong, string> _currentCharaDic = new Dictionary<ulong, string>();
     private Dictionary<string, NpcStatus> _npcStatus = new Dictionary<string, NpcStatus>();
@@ -88,12 +87,6 @@ partial class Program
             else if (content.StartsWith("?master san ")) await UpdateMasterRes("san", message, guild, user);
             else if (content.StartsWith("?master mp ")) await UpdateMasterRes("mp", message, guild, user);
 
-            else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user);
-            else if (content.StartsWith("?set npc res ")) await SetNpcRes(message, guild, user);
-            else if (content.StartsWith("?npc hp ")) await UpdateNpcHp(message, guild, user);
-            else if (content.StartsWith("?show npc bon ")) await ShowNpcBon(message, guild, user);
-            else if (content.StartsWith("?set npc bon ")) await SetNpcBon(message, guild, user);
-
             else if (content == "?r") await SimpleRoll(message, guild, user);
             else if (content.StartsWith("?r ")) await DiceRoll(message, guild, user);
 
@@ -105,6 +98,7 @@ partial class Program
             else if (content.StartsWith("?npc r ")) await NpcDiceRoll(message, guild, user);
 
             else if (content.StartsWith("?add stg ")) await AddStg(message, guild, user);
+            else if (content == "?show stg") await ShowStg(message, guild, user);
         }
     }
 }
