@@ -1,7 +1,20 @@
 ﻿using Discord.WebSocket;
+using System.Text.Json.Serialization;
 
 partial class Program
 {
+    public class EquipmentData
+    {
+        [JsonPropertyName("count")]
+        public int Count { get; set; }
+
+        [JsonPropertyName("durability")]
+        public int Durability { get; set; }
+
+        [JsonPropertyName("max_durability")]
+        public int MaxDurability { get; set; }
+    }
+
     private async Task UpdateStg(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
         var text = message.Content.Substring("?stg ".Length);
@@ -157,28 +170,28 @@ holly_coin = user_storage.holly_coin + EXCLUDED.holly_coin;",
                 var holly_coin = reader.GetInt16(reader.GetOrdinal("holly_coin"));
                 var b = reader.GetFieldValue<string>(reader.GetOrdinal("farm_list"));
 
-                var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("equipment_list")));
-                var equipment_list = string.Join(", ", dict.Select(kv => $"{kv.Key}×{kv.Value}"));
+                var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, EquipmentData>>(reader.GetFieldValue<string>(reader.GetOrdinal("equipment_list")));
+                var equipment_list = string.Join(", ", dict.Select(kv => $"{kv.Key}×{kv.Value.Count} {kv.Value.Durability}/{kv.Value.MaxDurability}"));
                 if (equipment_list.Length > 0) equipment_list += "\r\n";
 
-                dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("valuable_list")));
-                var valuable_list = string.Join(", ", dict.Select(kv => $"{kv.Key}×{kv.Value}"));
+                var dict2 = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("valuable_list")));
+                var valuable_list = string.Join(", ", dict2.Select(kv => $"{kv.Key}×{kv.Value}"));
                 if (valuable_list.Length > 0) valuable_list += "\r\n";
 
-                dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("recipe_list")));
-                var recipe_list = string.Join(", ", dict.Select(kv => $"{kv.Key}×{kv.Value}"));
+                dict2 = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("recipe_list")));
+                var recipe_list = string.Join(", ", dict2.Select(kv => $"{kv.Key}×{kv.Value}"));
                 if (recipe_list.Length > 0) recipe_list += "\r\n";
 
-                dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("tool_list")));
-                var tool_list = string.Join(", ", dict.Select(kv => $"{kv.Key}×{kv.Value}"));
+                dict2 = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("tool_list")));
+                var tool_list = string.Join(", ", dict2.Select(kv => $"{kv.Key}×{kv.Value}"));
                 if (tool_list.Length > 0) tool_list += "\r\n";
 
-                dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("material_list")));
-                var material_list = string.Join(", ", dict.Select(kv => $"{kv.Key}×{kv.Value}"));
+                dict2 = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("material_list")));
+                var material_list = string.Join(", ", dict2.Select(kv => $"{kv.Key}×{kv.Value}"));
                 if (material_list.Length > 0) material_list += "\r\n";
 
-                dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("farm_list")));
-                var farm_list = string.Join(", ", dict.Select(kv => $"{kv.Key}×{kv.Value}"));
+                dict2 = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(reader.GetFieldValue<string>(reader.GetOrdinal("farm_list")));
+                var farm_list = string.Join(", ", dict2.Select(kv => $"{kv.Key}×{kv.Value}"));
                 if (farm_list.Length > 0) farm_list += "\r\n";
 
                 await message.Channel.SendMessageAsync(
