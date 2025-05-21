@@ -56,7 +56,43 @@ partial class Program
                     break;
             }
 
-            await ConnectDatabase(@$"
+            if (texts[0] == "装備")
+            {
+                await ConnectDatabase(@$"
+INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin, equipment_list, valuable_list, recipe_list, tool_list, material_list, farm_list)
+VALUES (
+    @id,
+    0, 0, 0, 0,
+    jsonb_build_object(@item_id, GREATEST(@amount, 0)), '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb
+)
+ON CONFLICT (id)
+DO UPDATE SET {listName} = 
+    CASE 
+        WHEN COALESCE((user_storage.{listName}::jsonb->@item_id->>'count')::int, 0) + @amount <= 0 THEN 
+            user_storage.{listName}::jsonb - @item_id
+        ELSE 
+            jsonb_set(
+                user_storage.{listName}::jsonb,
+                @path,
+                jsonb_build_object(
+                    'count', GREATEST(COALESCE((user_storage.{listName}->@item_id->>'count')::int, 0) + @amount, 0),
+                    'durability', COALESCE((user_storage.{listName}->@item_id->>'durability')::int, 0),
+                    'max_durability', COALESCE((user_storage.{listName}->@item_id->>'max_durability')::int, 0)
+                ),
+                true
+            )
+    END",
+    parameters =>
+    {
+        parameters.AddWithValue("item_id", texts[1]);
+        parameters.AddWithValue("amount", short.Parse(texts[2]));
+        parameters.AddWithValue("id", currentChara);
+        parameters.AddWithValue("path", new string[] { texts[1] });
+    });
+            }
+            else
+            {
+                await ConnectDatabase(@$"
 INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin, equipment_list, valuable_list, recipe_list, tool_list, material_list, farm_list)
 VALUES (
     @id,
@@ -76,13 +112,14 @@ DO UPDATE SET {listName} =
                 true
             )
     END",
-                parameters =>
-                {
-                    parameters.AddWithValue("item_id", texts[1]);
-                    parameters.AddWithValue("amount", short.Parse(texts[2]));
-                    parameters.AddWithValue("id", currentChara);
-                    parameters.AddWithValue("path", new string[] { texts[1] });
-                });
+                    parameters =>
+                    {
+                        parameters.AddWithValue("item_id", texts[1]);
+                        parameters.AddWithValue("amount", short.Parse(texts[2]));
+                        parameters.AddWithValue("id", currentChara);
+                        parameters.AddWithValue("path", new string[] { texts[1] });
+                    });
+            }
 
             await DisplayStorage(currentChara, message);
         });
@@ -117,6 +154,29 @@ SET {type} = user_storage.{type} + EXCLUDED.{type};",
 
         await Command(texts, 1, message, user, async (currentChara) =>
         {
+            await ConnectDatabase($@"
+INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin)
+VALUES (@id, @copper_coin, @silver_coin, @gold_coin, @holly_coin);",
+                parameters =>
+                {
+                    parameters.AddWithValue("id", currentChara);
+                },
+                async (reader) =>
+                {
+                    await message.Channel.SendMessageAsync(
+                        $"{currentChara}\r\n" +
+                        "●リソース\r\n" +
+                        $"【HP】{reader.GetInt16(4)}/{reader.GetInt16(0)}【SP】{reader.GetInt16(5)}/{reader.GetInt16(1)}\r\n" +
+                        $"【SAN】{reader.GetInt16(6)}/{reader.GetInt16(2)}【MP】{reader.GetInt16(7)}/{reader.GetInt16(3)}\r\n" +
+                        "●状態\r\n" +
+                        "●永続状態");
+                },
+                async () =>
+                {
+                    await message.Channel.SendMessageAsync("キャラクターが見つかりませんでした。");
+                });
+
+
             int coin = short.Parse(texts[0]);
             int copperCoin = coin % 12;
             int silverCoin = coin % 144 / 12;

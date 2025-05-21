@@ -55,6 +55,8 @@ partial class Program
 
         await _client.LoginAsync(TokenType.Bot, token);
         await _client.StartAsync();
+
+        //await Create();
     }
 
     private async Task MessageReceivedAsync(SocketMessage message)
@@ -67,10 +69,22 @@ partial class Program
             var user = guild.GetUser(message.Author.Id);
             var content = message.Content;
 
-            if (content.StartsWith("?login ")) await Login(message, guild, user);
-            else if (content.StartsWith("?show data ")) await ShowData(message, guild, user);
+            if (content.StartsWith("?show data ")) await ShowData(message, guild, user);
             else if (content.StartsWith("?set data")) await SetData(message, guild, user);
 
+            // キャラクター
+            else if (content.StartsWith("?login ")) await Login(message, guild, user);
+
+            // 所有品
+            else if (content.StartsWith("?stg ")) await UpdateStg(message, guild, user);
+            else if (content.StartsWith("?copper_coin ")) await UpdateCoin("copper_coin", message, guild, user);
+            else if (content.StartsWith("?silver_coin ")) await UpdateCoin("silver_coin", message, guild, user);
+            else if (content.StartsWith("?gold_coin ")) await UpdateCoin("gold_coin", message, guild, user);
+            else if (content.StartsWith("?holly_coin ")) await UpdateCoin("holly_coin", message, guild, user);
+            else if (content.StartsWith("?coin ")) await UpdateCoin(message, guild, user);
+            else if (content == "?show stg") await ShowStg(message, guild, user);
+
+            // 装備
             else if (content == "?show res") await ShowRes(message, guild, user);
             else if (content.StartsWith("?set res ")) await SetRes(message, guild, user);
             else if (content.StartsWith("?hp ")) await UpdateRes("hp", message, guild, user);
@@ -87,6 +101,7 @@ partial class Program
             else if (content.StartsWith("?master san ")) await UpdateMasterRes("san", message, guild, user);
             else if (content.StartsWith("?master mp ")) await UpdateMasterRes("mp", message, guild, user);
 
+            // バトル
             else if (content == "?r") await SimpleRoll(message, guild, user);
             else if (content.StartsWith("?r ")) await DiceRoll(message, guild, user);
 
@@ -96,14 +111,49 @@ partial class Program
             else if (content.StartsWith("?show npc bon ")) await ShowNpcBon(message, guild, user);
             else if (content.StartsWith("?set npc bon ")) await SetNpcBon(message, guild, user);
             else if (content.StartsWith("?npc r ")) await NpcDiceRoll(message, guild, user);
-
-            else if (content.StartsWith("?stg ")) await UpdateStg(message, guild, user);
-            else if (content.StartsWith("?copper_coin ")) await UpdateCoin("copper_coin", message, guild, user);
-            else if (content.StartsWith("?silver_coin ")) await UpdateCoin("silver_coin", message, guild, user);
-            else if (content.StartsWith("?gold_coin ")) await UpdateCoin("gold_coin", message, guild, user);
-            else if (content.StartsWith("?holly_coin ")) await UpdateCoin("holly_coin", message, guild, user);
-            else if (content.StartsWith("?coin ")) await UpdateCoin(message, guild, user);
-            else if (content == "?show stg") await ShowStg(message, guild, user);
         }
     }
+
+    public async Task Command(string[] texts, long flag, SocketMessage message, SocketGuildUser user, Func<string, Task> onCompleted)
+    {
+        if (!GetPaseFlag(texts, flag))
+        {
+            await message.Channel.SendMessageAsync("引数が変です。");
+            return;
+        }
+
+        if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
+        {
+            await message.Channel.SendMessageAsync("「?login [キャラクター名]」を呼んでください。");
+            return;
+        }
+
+        await onCompleted.Invoke(currentChara);
+    }
+
+    private bool GetPaseFlag(string[] texts, long target)
+    {
+        if (texts.Length != target.ToString().Length)
+        {
+            return false;
+        }
+
+        long digit = 1;
+        foreach (string text in texts)
+        {
+            int flag = 0;
+
+            if (int.TryParse(text, out _)) flag = 1;
+            else if (float.TryParse(text, out _)) flag = 2;
+            else flag = 3;
+
+            long num = target % (digit * 10) / digit;
+            if (flag > num) return false;
+
+            digit *= 10;
+        }
+
+        return true;
+    }
+
 }

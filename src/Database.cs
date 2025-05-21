@@ -106,20 +106,32 @@ partial class Program
     {
         // var createSql = @"DROP TABLE IF EXISTS user_storage CASCADE";
 
-        var createSql = @"
-CREATE TABLE user_storage (
-  id TEXT PRIMARY KEY,
-  copper_coin INT DEFAULT 0,
-  silver_coin INT DEFAULT 0,
-  gold_coin INT DEFAULT 0,
-  holly_coin INT DEFAULT 0,
-  equipment_list JSONB DEFAULT '{}',
-  valuable_list JSONB DEFAULT '{}',
-  recipe_list JSONB DEFAULT '{}',
-  tool_list JSONB DEFAULT '{}',
-  material_list JSONB DEFAULT '{}',
-  farm_list JSONB DEFAULT '{}'
-);";
+        //        var createSql = @"
+        //CREATE TABLE user_storage (
+        //  id TEXT PRIMARY KEY,
+        //  copper_coin INT DEFAULT 0,
+        //  silver_coin INT DEFAULT 0,
+        //  gold_coin INT DEFAULT 0,
+        //  holly_coin INT DEFAULT 0,
+        //  equipment_list JSONB DEFAULT '{}',
+        //  valuable_list JSONB DEFAULT '{}',
+        //  recipe_list JSONB DEFAULT '{}',
+        //  tool_list JSONB DEFAULT '{}',
+        //  material_list JSONB DEFAULT '{}',
+        //  farm_list JSONB DEFAULT '{}'
+        //);";
+
+        var createSql = @"ALTER TABLE user_status
+ALTER COLUMN vit_b SET DEFAULT 1,
+ALTER COLUMN pow_b SET DEFAULT 1,
+ALTER COLUMN str_b SET DEFAULT 1,
+ALTER COLUMN int_b SET DEFAULT 1,
+ALTER COLUMN mag_b SET DEFAULT 1,
+ALTER COLUMN dex_b SET DEFAULT 1,
+ALTER COLUMN agi_b SET DEFAULT 1,
+ALTER COLUMN sns_b SET DEFAULT 1,
+ALTER COLUMN app_b SET DEFAULT 1,
+ALTER COLUMN luk_b SET DEFAULT 1;";
 
 
         await ConnectDatabase(createSql);
