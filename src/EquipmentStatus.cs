@@ -205,10 +205,14 @@ partial class Program
     private async Task DisplayResource(string currentChara, SocketMessage message)
     {
         await ConnectDatabase(
-@"INSERT INTO user_status (
-id, max_hp, max_sp, max_san, max_mp, hp, sp, san, mp)
-VALUES (@id, 0, 0, 0, 0, 0, 0, 0, 0)
-ON CONFLICT (id) DO NOTHING;",
+@"WITH upsert AS (
+    INSERT INTO user_status (id, max_hp, max_sp, max_san, max_mp, hp, sp, san, mp)
+    VALUES (@id, 0, 0, 0, 0, 0, 0, 0, 0)
+    ON CONFLICT (id) DO NOTHING
+)
+SELECT max_hp, max_sp, max_san, max_mp, hp, sp, san, mp
+FROM user_status
+WHERE id = @id;",
             parameters =>
             {
                 parameters.AddWithValue("id", currentChara);
@@ -249,10 +253,14 @@ ON CONFLICT (id) DO NOTHING;",
     private async Task DisplayBonus(string currentChara, SocketMessage message)
     {
         await ConnectDatabase(
-@"INSERT INTO user_status (
-id, vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b)
-VALUES (@id, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-ON CONFLICT (id) DO NOTHING;",
+@"WITH upsert AS (
+  INSERT INTO user_status (id, vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b)
+  VALUES (@id, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+  ON CONFLICT (id) DO NOTHING
+)
+SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b
+FROM user_status
+WHERE id = @id;",
             parameters =>
             {
                 parameters.AddWithValue("id", currentChara);
@@ -270,8 +278,8 @@ ON CONFLICT (id) DO NOTHING;",
                 await message.Channel.SendMessageAsync(
                     $"{currentChara}\r\n" +
                     "●能力値B\r\n" +
-                    $"0.0 生命, 0.0 精神, 0.0 筋力, 0.0 知力, 0.0 魔力\r\n" +
-                    $"0.0 器用, 0.0 敏捷, 0.0 感知, 0.0 魅力, 0.0 幸運");
+                    $"1 生命, 1 精神, 1 筋力, 1 知力, 1 魔力\r\n" +
+                    $"1 器用, 1 敏捷, 1 感知, 1 魅力, 1 幸運");
             });
     }
 
