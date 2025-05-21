@@ -77,10 +77,8 @@ partial class Program
 
             // 所有品
             else if (content.StartsWith("?stg ")) await UpdateStg(message, guild, user);
-            else if (content.StartsWith("?copper_coin ")) await UpdateCoin("copper_coin", message, guild, user);
-            else if (content.StartsWith("?silver_coin ")) await UpdateCoin("silver_coin", message, guild, user);
-            else if (content.StartsWith("?gold_coin ")) await UpdateCoin("gold_coin", message, guild, user);
-            else if (content.StartsWith("?holly_coin ")) await UpdateCoin("holly_coin", message, guild, user);
+            else if (content.StartsWith("?dur ")) await UpdateDur(message, guild, user);
+            else if (content.StartsWith("?set maxdur ")) await SetMaxDur(message, guild, user);
             else if (content.StartsWith("?coin ")) await UpdateCoin(message, guild, user);
             else if (content == "?show stg") await ShowStg(message, guild, user);
 

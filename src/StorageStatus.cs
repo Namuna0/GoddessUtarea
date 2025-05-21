@@ -125,25 +125,85 @@ DO UPDATE SET {listName} =
         });
     }
 
-    private async Task UpdateCoin(string type, SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    private async Task UpdateDur(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = message.Content.Substring($"?{type} ".Length);
+        var text = message.Content.Substring("?dur ".Length);
         var texts = text.Split(" ");
-
-        await Command(texts, 1, message, user, async (currentChara) =>
+        await Command(texts, 13, message, user, async (currentChara) =>
         {
-            await ConnectDatabase($@"
-INSERT INTO user_storage (id, {type})
-VALUES (@id, @{type})
-ON CONFLICT (id) DO UPDATE
-SET {type} = user_storage.{type} + EXCLUDED.{type};",
+            await ConnectDatabase(@$"
+INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin, equipment_list, valuable_list, recipe_list, tool_list, material_list, farm_list)
+VALUES (
+    @id,
+    0, 0, 0, 0,
+    jsonb_build_object(
+        @item_id, 
+        jsonb_build_object(
+            'count', 1,
+            'durability', GREATEST(@amount, 0),
+            'max_durability', GREATEST(@amount, 0)
+        )
+    ), '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb
+)
+ON CONFLICT (id)
+DO UPDATE SET equipment_list = jsonb_set(
+user_storage.equipment_list::jsonb,
+@path,
+jsonb_build_object(
+    'count', COALESCE((user_storage.equipment_list->@item_id->>'count')::int, 1),
+    'durability', GREATEST(COALESCE((user_storage.equipment_list->@item_id->>'durability')::int, 0) + @amount, 0),
+    'max_durability', COALESCE((user_storage.equipment_list->@item_id->>'max_durability')::int, 0)
+),
+true
+            );",
             parameters =>
             {
+                parameters.AddWithValue("item_id", texts[0]);
+                parameters.AddWithValue("amount", short.Parse(texts[1]));
                 parameters.AddWithValue("id", currentChara);
-                parameters.AddWithValue($"{type}", short.Parse(texts[0]));
+                parameters.AddWithValue("path", new string[] { texts[0] });
             });
+        });
+    }
 
-            await DisplayStorage(currentChara, message);
+    private async Task SetMaxDur(SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    {
+        var text = message.Content.Substring("?set maxdur ".Length);
+        var texts = text.Split(" ");
+        await Command(texts, 13, message, user, async (currentChara) =>
+        {
+            await ConnectDatabase(@$"
+INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin, equipment_list, valuable_list, recipe_list, tool_list, material_list, farm_list)
+VALUES (
+    @id,
+    0, 0, 0, 0,
+    jsonb_build_object(
+        @item_id, 
+        jsonb_build_object(
+            'count', 1,
+            'durability', GREATEST(@amount, 0),
+            'max_durability', GREATEST(@amount, 0)
+        )
+    ), '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb
+)
+ON CONFLICT (id)
+DO UPDATE SET equipment_list = jsonb_set(
+user_storage.equipment_list::jsonb,
+@path,
+jsonb_build_object(
+    'count', COALESCE((user_storage.equipment_list->@item_id->>'count')::int, 1),
+    'durability', COALESCE((user_storage.equipment_list->@item_id->>'durability')::int, 0),
+    'max_durability', @amount)
+),
+true
+            );",
+            parameters =>
+            {
+                parameters.AddWithValue("item_id", texts[0]);
+                parameters.AddWithValue("amount", short.Parse(texts[1]));
+                parameters.AddWithValue("id", currentChara);
+                parameters.AddWithValue("path", new string[] { texts[0] });
+            });
         });
     }
 
