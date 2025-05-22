@@ -217,27 +217,27 @@ jsonb_build_object(
 
         await Command(texts, 1, message, user, async (currentChara) =>
         {
-            await ConnectDatabase($@"
-INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin)
-VALUES (@id, @copper_coin, @silver_coin, @gold_coin, @holly_coin);",
-                parameters =>
-                {
-                    parameters.AddWithValue("id", currentChara);
-                },
-                async (reader) =>
-                {
-                    await message.Channel.SendMessageAsync(
-                        $"{currentChara}\r\n" +
-                        "●リソース\r\n" +
-                        $"【HP】{reader.GetInt16(4)}/{reader.GetInt16(0)}【SP】{reader.GetInt16(5)}/{reader.GetInt16(1)}\r\n" +
-                        $"【SAN】{reader.GetInt16(6)}/{reader.GetInt16(2)}【MP】{reader.GetInt16(7)}/{reader.GetInt16(3)}\r\n" +
-                        "●状態\r\n" +
-                        "●永続状態");
-                },
-                async () =>
-                {
-                    await message.Channel.SendMessageAsync("キャラクターが見つかりませんでした。");
-                });
+//            await ConnectDatabase($@"
+//INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin)
+//VALUES (@id, @copper_coin, @silver_coin, @gold_coin, @holly_coin);",
+//                parameters =>
+//                {
+//                    parameters.AddWithValue("id", currentChara);
+//                },
+//                async (reader) =>
+//                {
+//                    await message.Channel.SendMessageAsync(
+//                        $"{currentChara}\r\n" +
+//                        "●リソース\r\n" +
+//                        $"【HP】{reader.GetInt16(4)}/{reader.GetInt16(0)}【SP】{reader.GetInt16(5)}/{reader.GetInt16(1)}\r\n" +
+//                        $"【SAN】{reader.GetInt16(6)}/{reader.GetInt16(2)}【MP】{reader.GetInt16(7)}/{reader.GetInt16(3)}\r\n" +
+//                        "●状態\r\n" +
+//                        "●永続状態");
+//                },
+//                async () =>
+//                {
+//                    await message.Channel.SendMessageAsync("キャラクターが見つかりませんでした。");
+//                });
 
 
             int coin = short.Parse(texts[0]);
