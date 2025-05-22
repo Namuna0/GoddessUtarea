@@ -121,18 +121,7 @@ partial class Program
         //  farm_list JSONB DEFAULT '{}'
         //);";
 
-        var createSql = @"ALTER TABLE user_status
-ALTER COLUMN vit_b SET DEFAULT 1.0,
-ALTER COLUMN pow_b SET DEFAULT 1.0,
-ALTER COLUMN str_b SET DEFAULT 1.0,
-ALTER COLUMN int_b SET DEFAULT 1.0,
-ALTER COLUMN mag_b SET DEFAULT 1.0,
-ALTER COLUMN dex_b SET DEFAULT 1.0,
-ALTER COLUMN agi_b SET DEFAULT 1.0,
-ALTER COLUMN sns_b SET DEFAULT 1.0,
-ALTER COLUMN app_b SET DEFAULT 1.0,
-ALTER COLUMN luk_b SET DEFAULT 1.0;";
-
+        var createSql = @"ALTER TABLE user_status RENAME TO character_equipment;";
 
         await ConnectDatabase(createSql);
 

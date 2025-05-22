@@ -74,13 +74,15 @@ partial class Program
 
             // キャラクター
             else if (content.StartsWith("?login ")) await Login(message, guild, user);
+            else if (content == "?show sta") await ShowSta(message, guild, user);
+            //else if (content.StartsWith("?set sta ")) await SetSta(message, guild, user);
 
             // 所有品
+            else if (content == "?show stg") await ShowStg(message, guild, user);
             else if (content.StartsWith("?stg ")) await UpdateStg(message, guild, user);
             else if (content.StartsWith("?dur ")) await UpdateDur(message, guild, user);
             else if (content.StartsWith("?set maxdur ")) await SetMaxDur(message, guild, user);
             else if (content.StartsWith("?coin ")) await UpdateCoin(message, guild, user);
-            else if (content == "?show stg") await ShowStg(message, guild, user);
 
             // 装備
             else if (content == "?show res") await ShowRes(message, guild, user);

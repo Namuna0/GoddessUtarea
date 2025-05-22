@@ -56,7 +56,7 @@ partial class Program
             status.Mp = status.MaxMp;
 
             await ConnectDatabase(
-                @"INSERT INTO user_status (id, max_hp, max_sp, max_san, max_mp, hp, sp, san, mp)" +
+                @"INSERT INTO character_equipment (id, max_hp, max_sp, max_san, max_mp, hp, sp, san, mp)" +
                 @"VALUES (@id, @max_hp, @max_sp, @max_san, @max_mp, @hp, @sp, @san, @mp)" +
                 @"ON CONFLICT (id) DO UPDATE SET max_hp = EXCLUDED.max_hp, max_sp = EXCLUDED.max_sp, max_san = EXCLUDED.max_san, max_mp = EXCLUDED.max_mp, hp = EXCLUDED.hp, sp = EXCLUDED.sp, san = EXCLUDED.san, mp = EXCLUDED.mp;",
                 parameters =>
@@ -83,9 +83,9 @@ partial class Program
         await Command(texts, 1, message, user, async (currentChara) =>
         {
             await ConnectDatabase(
-                @$"INSERT INTO user_status (id, {res})" +
+                @$"INSERT INTO character_equipment (id, {res})" +
                 @$"VALUES (@id, @{res})" +
-                @$"ON CONFLICT (id) DO UPDATE SET {res} = user_status.{res} + EXCLUDED.{res};",
+                @$"ON CONFLICT (id) DO UPDATE SET {res} = character_equipment.{res} + EXCLUDED.{res};",
                 parameters =>
                 {
                     parameters.AddWithValue("id", currentChara);
@@ -126,7 +126,7 @@ partial class Program
             status.LukB = float.Parse(texts[9]);
 
             await ConnectDatabase(
-                @"INSERT INTO user_status (id, vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b)" +
+                @"INSERT INTO character_equipment (id, vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b)" +
                 @"VALUES (@id, @vit_b, @pow_b, @str_b, @int_b, @mag_b, @dex_b, @agi_b, @sns_b, @app_b, @luk_b)" +
                 @"ON CONFLICT (id) DO UPDATE SET vit_b = EXCLUDED.vit_b, pow_b = EXCLUDED.pow_b, str_b = EXCLUDED.str_b, int_b = EXCLUDED.int_b, mag_b = EXCLUDED.mag_b, dex_b = EXCLUDED.dex_b, agi_b = EXCLUDED.agi_b, sns_b = EXCLUDED.sns_b, app_b = EXCLUDED.app_b, luk_b = EXCLUDED.luk_b;",
                 parameters =>
@@ -155,7 +155,7 @@ partial class Program
         await Command(texts, 3, message, user, async (currentChara) =>
         {
             await ConnectDatabase(
-                @"INSERT INTO user_status (id, wep_p)" +
+                @"INSERT INTO character_equipment (id, wep_p)" +
                 @"VALUES (@id, @wep_p)" +
                 @"ON CONFLICT (id) DO UPDATE SET wep_p = EXCLUDED.wep_p;",
                 parameters =>
@@ -189,9 +189,9 @@ partial class Program
         await Command(texts, 13, message, user, async (currentChara) =>
         {
             await ConnectDatabase(
-                @$"INSERT INTO user_status (id, {res})" +
+                @$"INSERT INTO character_equipment (id, {res})" +
                 @$"VALUES (@id, @{res})" +
-                @$"ON CONFLICT (id) DO UPDATE SET {res} = user_status.{res} + EXCLUDED.{res};",
+                @$"ON CONFLICT (id) DO UPDATE SET {res} = character_equipment.{res} + EXCLUDED.{res};",
                 parameters =>
                 {
                     parameters.AddWithValue("id", texts[0]);
@@ -206,12 +206,12 @@ partial class Program
     {
         await ConnectDatabase(
 @"WITH upsert AS (
-    INSERT INTO user_status (id, max_hp, max_sp, max_san, max_mp, hp, sp, san, mp)
+    INSERT INTO character_equipment (id, max_hp, max_sp, max_san, max_mp, hp, sp, san, mp)
     VALUES (@id, 0, 0, 0, 0, 0, 0, 0, 0)
     ON CONFLICT (id) DO NOTHING
 )
 SELECT max_hp, max_sp, max_san, max_mp, hp, sp, san, mp
-FROM user_status
+FROM character_equipment
 WHERE id = @id;",
             parameters =>
             {
@@ -254,12 +254,12 @@ WHERE id = @id;",
     {
         await ConnectDatabase(
 @"WITH upsert AS (
-  INSERT INTO user_status (id, vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b)
+  INSERT INTO character_equipment (id, vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b)
   VALUES (@id, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
   ON CONFLICT (id) DO NOTHING
 )
 SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b
-FROM user_status
+FROM character_equipment
 WHERE id = @id;",
             parameters =>
             {
