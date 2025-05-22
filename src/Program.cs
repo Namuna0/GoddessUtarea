@@ -104,6 +104,7 @@ partial class Program
             // バトル
             else if (content == "?r") await SimpleRoll(message, guild, user);
             else if (content.StartsWith("?r ")) await DiceRoll(message, guild, user);
+            else if (content == "?durR") await RollDurability(message, guild, user);
 
             else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user);
             else if (content.StartsWith("?set npc res ")) await SetNpcRes(message, guild, user);

@@ -72,14 +72,48 @@ partial class Program
                 }
 
                 await message.Channel.SendMessageAsync(
-                $"<@{user.Id}> :game_die:{currentChara}{comment}\r\n" +
-                $"{showResult}=>{culcResult}");
+                    $"<@{user.Id}> :game_die:{currentChara}{comment}\r\n" +
+                    $"{showResult}=>{culcResult}");
             },
             async () =>
             {
                 await message.Channel.SendMessageAsync("キャラクターが見つかりませんでした。");
             });
     }
+
+    private async Task RollDurability(SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    {
+        if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
+        {
+            await message.Channel.SendMessageAsync("「?login [キャラクター名]」を呼んでください。");
+            return;
+        }
+
+        var culcText = "1d20";
+        var showText = "1d20";
+
+        CalcDice(ref culcText, ref showText);
+
+        showText = showText.Replace("*", @"\*");
+
+        int eye = int.Parse(culcText);
+
+        string part = "";
+        if (eye <= 2) part = "〈右手〉";
+        else if (eye <= 4) part = "〈左手〉";
+        else if (eye <= 6) part = "〈頭〉";
+        else if (eye <= 8) part = "〈胴体〉";
+        else if (eye <= 10) part = "〈脚/足〉";
+        else if (eye <= 12) part = "〈アクセサリー1〉";
+        else if (eye <= 14) part = "〈アクセサリー2〉";
+        else part = "何もなし";
+
+        await message.Channel.SendMessageAsync(
+            $"<@{user.Id}> :game_die:{currentChara}\r\n" +
+            $"{showText}=>{showText}\r\n" +
+            $"耐久ロール：{part}");
+    }
+
 
     private async Task ShowNpcRes(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
