@@ -32,7 +32,37 @@ partial class Program
 
     private async Task DisplayStatus(string currentChara, SocketMessage message)
     {
-        await ConnectDatabase("SELECT * FROM character_equipment WHERE id = @id;",
+        await ConnectDatabase(
+@"WITH upsert AS (
+    INSERT INTO character_status (id, race, gender, life_path,
+    vit_base, vit_growth, vit_life, vit_class, vit_race,
+    pow_base, pow_growth, pow_life, pow_class, pow_race,
+    str_base, str_growth, str_life, str_class, str_race,
+    int_base, int_growth, int_life, int_class, int_race,
+    mag_base, mag_growth, mag_life, mag_class, mag_race,
+    dex_base, dex_growth, dex_life, dex_class, dex_race,
+    agi_base, agi_growth, agi_life, agi_class, agi_race,
+    sns_base, sns_growth, sns_life, sns_class, sns_race,
+    app_base, app_growth, app_life, app_class, app_race,
+    luk_base, luk_growth, luk_life, luk_class, luk_race,
+    fire_base, fire_title, fire_race,
+    water_base, water_title, water_race,
+    wing_base, wing_title, wing_race,
+    electric_base, electric_title, electric_race,
+    cold_base, cold_title, cold_race,
+    soil_base, soil_title, soil_race,
+    level, exp, det,
+    title,
+    class,
+    applied_class,
+    traits,
+    skill)
+    VALUES (@id, 0, 0, 0, 0, 0, 0, 0, 0)
+    ON CONFLICT (id) DO NOTHING
+)
+SELECT max_hp, max_sp, max_san, max_mp, hp, sp, san, mp
+FROM character_equipment
+WHERE id = @id;",
             parameters =>
             {
                 parameters.AddWithValue("id", currentChara);

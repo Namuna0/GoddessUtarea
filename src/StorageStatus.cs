@@ -217,34 +217,101 @@ jsonb_build_object(
 
         await Command(texts, 1, message, user, async (currentChara) =>
         {
-//            await ConnectDatabase($@"
-//INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin)
-//VALUES (@id, @copper_coin, @silver_coin, @gold_coin, @holly_coin);",
-//                parameters =>
-//                {
-//                    parameters.AddWithValue("id", currentChara);
-//                },
-//                async (reader) =>
-//                {
-//                    await message.Channel.SendMessageAsync(
-//                        $"{currentChara}\r\n" +
-//                        "●リソース\r\n" +
-//                        $"【HP】{reader.GetInt16(4)}/{reader.GetInt16(0)}【SP】{reader.GetInt16(5)}/{reader.GetInt16(1)}\r\n" +
-//                        $"【SAN】{reader.GetInt16(6)}/{reader.GetInt16(2)}【MP】{reader.GetInt16(7)}/{reader.GetInt16(3)}\r\n" +
-//                        "●状態\r\n" +
-//                        "●永続状態");
-//                },
-//                async () =>
-//                {
-//                    await message.Channel.SendMessageAsync("キャラクターが見つかりませんでした。");
-//                });
-
-
             int coin = short.Parse(texts[0]);
-            int copperCoin = coin % 12;
-            int silverCoin = coin % 144 / 12;
-            int goldCoin = coin % 1728 / 144;
-            int hollyCoin = coin / 1728;
+            int copperCoin = 0;
+            int silverCoin = 0;
+            int goldCoin = 0;
+            int hollyCoin = 0;
+
+            await ConnectDatabase(@"
+WITH upsert AS (
+  INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin)
+  VALUES (@id, 0, 0, 0, 0)
+  ON CONFLICT (id) DO NOTHING
+)
+SELECT copper_coin, silver_coin, gold_coin, holly_coin
+FROM user_storage
+WHERE id = @id;",
+                parameters =>
+                {
+                    parameters.AddWithValue("id", currentChara);
+                },
+                async (reader) =>
+                {
+                    copperCoin = reader.GetInt16(0);
+                    silverCoin = reader.GetInt16(1);
+                    goldCoin = reader.GetInt16(2);
+                    hollyCoin = reader.GetInt16(3);
+
+                    await Task.Yield();
+                },
+                async () =>
+                {
+                    await message.Channel.SendMessageAsync(
+                 $"{currentChara}\r\n" +
+                 $"{0}\r\n" +
+                 $"{0}\r\n" +
+                 $"{0}\r\n");
+                });
+
+            copperCoin += coin;
+            while (true)
+            {
+                if (copperCoin < 0)
+                {
+                    copperCoin += 12;
+                    silverCoin--;
+                }
+                else if (copperCoin > 12)
+                {
+                    copperCoin -= 12;
+                    silverCoin++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            while (true)
+            {
+                if (silverCoin < 0)
+                {
+                    silverCoin += 12;
+                    goldCoin--;
+                }
+                else if (silverCoin > 12)
+                {
+                    silverCoin -= 12;
+                    goldCoin++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            while (true)
+            {
+                if (goldCoin < 0)
+                {
+                    goldCoin += 12;
+                    hollyCoin--;
+                }
+                else if (goldCoin > 12)
+                {
+                    goldCoin -= 12;
+                    hollyCoin++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (hollyCoin < 0)
+            {
+                await message.Channel.SendMessageAsync("お金が足りません。");
+                return;
+            }
 
             await ConnectDatabase($@"
 INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin)
