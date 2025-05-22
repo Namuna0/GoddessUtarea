@@ -76,8 +76,8 @@ DO UPDATE SET {listName} =
                 @path,
                 jsonb_build_object(
                     'count', GREATEST(COALESCE((user_storage.{listName}->@item_id->>'count')::int, 0) + @amount, 0),
-                    'durability', COALESCE((user_storage.{listName}->@item_id->>'durability')::int, 0),
-                    'max_durability', COALESCE((user_storage.{listName}->@item_id->>'max_durability')::int, 0)
+                    'durability', COALESCE((user_storage.{listName}->@item_id->>'durability')::int, 10),
+                    'max_durability', COALESCE((user_storage.{listName}->@item_id->>'max_durability')::int, 10)
                 ),
                 true
             )
@@ -163,6 +163,8 @@ true
                 parameters.AddWithValue("id", currentChara);
                 parameters.AddWithValue("path", new string[] { texts[0] });
             });
+
+            await DisplayStorage(currentChara, message);
         });
     }
 
@@ -193,10 +195,9 @@ user_storage.equipment_list::jsonb,
 jsonb_build_object(
     'count', COALESCE((user_storage.equipment_list->@item_id->>'count')::int, 1),
     'durability', COALESCE((user_storage.equipment_list->@item_id->>'durability')::int, 0),
-    'max_durability', @amount)
-),
-true
-            );",
+    'max_durability', @amount),
+    true
+);",
             parameters =>
             {
                 parameters.AddWithValue("item_id", texts[0]);
@@ -204,6 +205,8 @@ true
                 parameters.AddWithValue("id", currentChara);
                 parameters.AddWithValue("path", new string[] { texts[0] });
             });
+
+            await DisplayStorage(currentChara, message);
         });
     }
 
