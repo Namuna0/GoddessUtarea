@@ -247,67 +247,17 @@ WHERE id = @id;",
                 },
                 async () =>
                 {
-                    await message.Channel.SendMessageAsync(
-                 $"{currentChara}\r\n" +
-                 $"{0}\r\n" +
-                 $"{0}\r\n" +
-                 $"{0}\r\n");
+                    await Task.Yield();
                 });
 
-            copperCoin += coin;
-            while (true)
-            {
-                if (copperCoin < 0)
-                {
-                    copperCoin += 12;
-                    silverCoin--;
-                }
-                else if (copperCoin > 12)
-                {
-                    copperCoin -= 12;
-                    silverCoin++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            while (true)
-            {
-                if (silverCoin < 0)
-                {
-                    silverCoin += 12;
-                    goldCoin--;
-                }
-                else if (silverCoin > 12)
-                {
-                    silverCoin -= 12;
-                    goldCoin++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            while (true)
-            {
-                if (goldCoin < 0)
-                {
-                    goldCoin += 12;
-                    hollyCoin--;
-                }
-                else if (goldCoin > 12)
-                {
-                    goldCoin -= 12;
-                    hollyCoin++;
-                }
-                else
-                {
-                    break;
-                }
-            }
+            coin += copperCoin + silverCoin * 12 + goldCoin * 144 + hollyCoin * 1728;
 
-            if (hollyCoin < 0)
+            copperCoin = coin % 12;
+            silverCoin = coin % 144 / 12;
+            goldCoin = coin % 1728 / 144;
+            hollyCoin = coin / 1728;
+
+            if (coin < 0)
             {
                 await message.Channel.SendMessageAsync("お金が足りません。");
                 return;
