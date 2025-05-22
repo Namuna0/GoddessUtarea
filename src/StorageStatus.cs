@@ -317,10 +317,10 @@ WHERE id = @id;",
 INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin)
 VALUES (@id, @copper_coin, @silver_coin, @gold_coin, @holly_coin)
 ON CONFLICT (id) DO UPDATE
-SET copper_coin = user_storage.copper_coin + EXCLUDED.copper_coin,
-silver_coin = user_storage.silver_coin + EXCLUDED.silver_coin,
-gold_coin = user_storage.gold_coin + EXCLUDED.gold_coin,
-holly_coin = user_storage.holly_coin + EXCLUDED.holly_coin;",
+SET copper_coin = EXCLUDED.copper_coin,
+silver_coin = EXCLUDED.silver_coin,
+gold_coin = EXCLUDED.gold_coin,
+holly_coin = EXCLUDED.holly_coin;",
             parameters =>
             {
                 parameters.AddWithValue("id", currentChara);
