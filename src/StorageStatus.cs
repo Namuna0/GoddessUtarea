@@ -28,32 +28,10 @@ partial class Program
             else if (texts[0] == "道具") listName = "tool_list";
             else if (texts[0] == "素材") listName = "material_list";
             else if (texts[0] == "農業") listName = "farm_list";
-
-            switch (texts[0])
+            else
             {
-                case "装備":
-                    listName = "equipment_list";
-                    break;
-
-                case "貴重品":
-                    listName = "valuable_list";
-                    break;
-
-                case "レシピ":
-                    listName = "recipe_list";
-                    break;
-
-                case "道具":
-                    listName = "tool_list";
-                    break;
-
-                case "素材":
-                    listName = "material_list";
-                    break;
-
-                case "農業":
-                    listName = "farm_list";
-                    break;
+                await message.Channel.SendMessageAsync("存在しないリストです。");
+                return;
             }
 
             if (texts[0] == "装備")

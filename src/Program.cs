@@ -2,7 +2,6 @@
 using Discord.WebSocket;
 using dotenv.net;
 using MathNet.Numerics.Random;
-using Npgsql;
 
 partial class Program
 {
@@ -75,7 +74,30 @@ partial class Program
             // キャラクター
             else if (content.StartsWith("?login ")) await Login(message, guild, user);
             else if (content == "?show sta") await ShowSta(message, guild, user);
-            //else if (content.StartsWith("?set sta ")) await SetSta(message, guild, user);
+            else if (content.StartsWith("?set sta")) await SetSta(message, guild, user);
+            else if (content.StartsWith("?set vit ")) await SetAbi("vit", message, guild, user);
+            else if (content.StartsWith("?set pow ")) await SetAbi("pow", message, guild, user);
+            else if (content.StartsWith("?set str ")) await SetAbi("str", message, guild, user);
+            else if (content.StartsWith("?set int ")) await SetAbi("int", message, guild, user);
+            else if (content.StartsWith("?set mag ")) await SetAbi("mag", message, guild, user);
+            else if (content.StartsWith("?set dex ")) await SetAbi("dex", message, guild, user);
+            else if (content.StartsWith("?set agi ")) await SetAbi("agi", message, guild, user);
+            else if (content.StartsWith("?set sns ")) await SetAbi("sns", message, guild, user);
+            else if (content.StartsWith("?set app ")) await SetAbi("app", message, guild, user);
+            else if (content.StartsWith("?set luk ")) await SetAbi("luk", message, guild, user);
+            else if (content.StartsWith("?set fire ")) await SetEle("fire", message, guild, user);
+            else if (content.StartsWith("?set water ")) await SetEle("water", message, guild, user);
+            else if (content.StartsWith("?set wing ")) await SetEle("wing", message, guild, user);
+            else if (content.StartsWith("?set electric ")) await SetEle("electric", message, guild, user);
+            else if (content.StartsWith("?set cold ")) await SetEle("cold", message, guild, user);
+            else if (content.StartsWith("?set soil ")) await SetEle("soil", message, guild, user);
+
+            else if (content.StartsWith("?level ")) await UpdateLevel(message, guild, user);
+            else if (content.StartsWith("?exp ")) await UpdateExp(message, guild, user);
+            else if (content.StartsWith("?det ")) await UpdateDet(message, guild, user);
+            else if (content.StartsWith("?e&d ")) await UpdateExpDet(message, guild, user);
+            else if (content.StartsWith("?add sta ")) await AddSta(message, guild, user);
+            else if (content.StartsWith("?remove sta ")) await RemoveSta(message, guild, user);
 
             // 所有品
             else if (content == "?show stg") await ShowStg(message, guild, user);
@@ -87,6 +109,7 @@ partial class Program
             // 装備
             else if (content == "?show res") await ShowRes(message, guild, user);
             else if (content.StartsWith("?set res ")) await SetRes(message, guild, user);
+            else if (content == "?reset res") await ResetRes(message, guild, user);
             else if (content.StartsWith("?hp ")) await UpdateRes("hp", message, guild, user);
             else if (content.StartsWith("?sp ")) await UpdateRes("sp", message, guild, user);
             else if (content.StartsWith("?san ")) await UpdateRes("san", message, guild, user);
@@ -104,7 +127,7 @@ partial class Program
             // バトル
             else if (content == "?r") await SimpleRoll(message, guild, user);
             else if (content.StartsWith("?r ")) await DiceRoll(message, guild, user);
-            else if (content == "?durR") await RollDurability(message, guild, user);
+            else if (content == "?durr") await RollDurability(message, guild, user);
 
             else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user);
             else if (content.StartsWith("?set npc res ")) await SetNpcRes(message, guild, user);

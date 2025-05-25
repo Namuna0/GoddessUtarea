@@ -282,7 +282,7 @@ partial class Program
 
         if (status != null)
         {
-            ReplaceWeponPower(@"武器威力R:(\d+)", status.WepP, ref culcText, ref showText);
+            ReplaceWeponPower(@"武器R:(\d+)", status.WepP, ref culcText, ref showText);
 
             ReplaceBonus("[生命B]", status.VitB, ref culcText, ref showText);
             ReplaceBonus("[精神B]", status.PowB, ref culcText, ref showText);

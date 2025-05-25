@@ -76,6 +76,32 @@ partial class Program
         });
     }
 
+    private async Task ResetRes(SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    {
+        if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
+        {
+            await message.Channel.SendMessageAsync("「?login [キャラクター名]」を呼んでください。");
+            return;
+        }
+
+        await ConnectDatabase(
+            @"INSERT INTO character_equipment (id, max_hp, max_sp, max_san, max_mp, hp, sp, san, mp)" +
+            @"VALUES (@id, 0, 0, 0, 0, 0, 0, 0, 0)" +
+            @"ON CONFLICT (id) DO UPDATE SET hp = max_hp, sp = max_sp, san = max_san, mp = max_mp;",
+            parameters =>
+            {
+                parameters.AddWithValue("id", currentChara);
+            });
+
+        var status = new EquipmentStatus();
+        status.Hp = status.MaxHp;
+        status.Sp = status.MaxSp;
+        status.San = status.MaxSan;
+        status.Mp = status.MaxMp;
+
+        await DisplayResource(currentChara, status, message);
+    }
+
     private async Task UpdateRes(string res, SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
         var text = message.Content.Substring($"?{res} ".Length);
