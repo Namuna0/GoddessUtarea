@@ -199,13 +199,12 @@ SET det = character_status.det + EXCLUDED.det;",
         });
     }
 
-
     private async Task UpdateExpDet(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
         var text = message.Content.Substring($"?e&d ".Length);
         var texts = text.Split(" ");
 
-        await Command(texts, 1, message, user, async (currentChara) =>
+        await Command(texts, 11, message, user, async (currentChara) =>
         {
             int add = short.Parse(texts[0]);
 
@@ -220,6 +219,39 @@ det = character_status.det + EXCLUDED.det;",
                 parameters.AddWithValue("id", currentChara);
                 parameters.AddWithValue("exp", add);
                 parameters.AddWithValue("det", add);
+            });
+
+            await DisplayStatus(currentChara, message);
+        });
+    }
+
+    private async Task SetResRate(SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    {
+        var text = message.Content.Substring($"?set resrate ".Length);
+        var texts = text.Split(" ");
+
+        await Command(texts, 2222, message, user, async (currentChara) =>
+        {
+            float hp_rate = float.Parse(texts[0]);
+            float sp_rate = float.Parse(texts[1]);
+            float san_rate = float.Parse(texts[2]);
+            float mp_rate = float.Parse(texts[3]);
+
+            await ConnectDatabase(@"
+INSERT INTO character_status (id, hp_rate, sp_rate, san_rate, mp_rate)
+VALUES (@id, @hp_rate, @sp_rate, @san_rate, @mp_rate)
+ON CONFLICT (id) DO UPDATE
+SET hp_rate = EXCLUDED.hp_rate,
+sp_rate = EXCLUDED.sp_rate,
+san_rate = EXCLUDED.san_rate,
+mp_rate = EXCLUDED.mp_rate;",
+            parameters =>
+            {
+                parameters.AddWithValue("id", currentChara);
+                parameters.AddWithValue($"hp_rate", hp_rate);
+                parameters.AddWithValue($"sp_rate", sp_rate);
+                parameters.AddWithValue($"san_rate", san_rate);
+                parameters.AddWithValue($"mp_rate", mp_rate);
             });
 
             await DisplayStatus(currentChara, message);
@@ -258,11 +290,12 @@ INSERT INTO character_status (id, race, gender, life_path,
     luk_base, luk_growth, luk_life, luk_class, luk_race,
     fire_base, fire_title, fire_race,
     water_base, water_title, water_race,
-    wing_base, wing_title, wing_race,
+    wind_base, wind_title, wind_race,
     electric_base, electric_title, electric_race,
     cold_base, cold_title, cold_race,
     soil_base, soil_title, soil_race,
     level, exp, det,
+    hp_rate, sp_rate, san_rate, mp_rate,
     title_list,
     class_list,
     applied_class_list,
@@ -286,6 +319,7 @@ INSERT INTO character_status (id, race, gender, life_path,
     0, 0, 1.0,
     0, 0, 1.0,
     1, 0, 0,
+    1.0, 1.0, 1.0, 1.0,
     to_jsonb(ARRAY[@item_id]),
     '[]'::jsonb,
     '[]'::jsonb,
@@ -339,11 +373,12 @@ INSERT INTO character_status (id, race, gender, life_path,
     luk_base, luk_growth, luk_life, luk_class, luk_race,
     fire_base, fire_title, fire_race,
     water_base, water_title, water_race,
-    wing_base, wing_title, wing_race,
+    wind_base, wind_title, wind_race,
     electric_base, electric_title, electric_race,
     cold_base, cold_title, cold_race,
     soil_base, soil_title, soil_race,
     level, exp, det,
+    hp_rate, sp_rate, san_rate, mp_rate,
     title_list,
     class_list,
     applied_class_list,
@@ -367,6 +402,7 @@ INSERT INTO character_status (id, race, gender, life_path,
     0, 0, 1.0,
     0, 0, 1.0,
     1, 0, 0,
+    1.0, 1.0, 1.0, 1.0,
     to_jsonb(ARRAY[@item_id]),
     '[]'::jsonb,
     '[]'::jsonb,
@@ -407,11 +443,12 @@ DO UPDATE SET {listName} = (
         luk_base, luk_growth, luk_life, luk_class, luk_race,
         fire_base, fire_title, fire_race,
         water_base, water_title, water_race,
-        wing_base, wing_title, wing_race,
+        wind_base, wind_title, wind_race,
         electric_base, electric_title, electric_race,
         cold_base, cold_title, cold_race,
         soil_base, soil_title, soil_race,
         level, exp, det,
+        hp_rate, sp_rate, san_rate, mp_rate,
         title_list,
         class_list,
         applied_class_list,
@@ -435,6 +472,7 @@ DO UPDATE SET {listName} = (
         0, 0, 1.0,
         0, 0, 1.0,
         1, 0, 0,
+        1.0, 1.0, 1.0, 1.0,
         '[]'::jsonb,
         '[]'::jsonb,
         '[]'::jsonb,
@@ -456,11 +494,12 @@ app_base, app_growth, app_life, app_class, app_race,
 luk_base, luk_growth, luk_life, luk_class, luk_race,
 fire_base, fire_title, fire_race,
 water_base, water_title, water_race,
-wing_base, wing_title, wing_race,
+wind_base, wind_title, wind_race,
 electric_base, electric_title, electric_race,
 cold_base, cold_title, cold_race,
 soil_base, soil_title, soil_race,
 level, exp, det,
+hp_rate, sp_rate, san_rate, mp_rate,
 title_list,
 class_list,
 applied_class_list,
@@ -534,9 +573,9 @@ WHERE id = @id;",
                 var water_base = reader.GetInt16(reader.GetOrdinal("water_base"));
                 var water_title = reader.GetInt16(reader.GetOrdinal("water_title"));
                 var water_race = reader.GetFloat(reader.GetOrdinal("water_race"));
-                var wind_base = reader.GetInt16(reader.GetOrdinal("wing_base"));
-                var wind_title = reader.GetInt16(reader.GetOrdinal("wing_title"));
-                var wind_race = reader.GetFloat(reader.GetOrdinal("wing_race"));
+                var wind_base = reader.GetInt16(reader.GetOrdinal("wind_base"));
+                var wind_title = reader.GetInt16(reader.GetOrdinal("wind_title"));
+                var wind_race = reader.GetFloat(reader.GetOrdinal("wind_race"));
                 var electric_base = reader.GetInt16(reader.GetOrdinal("electric_base"));
                 var electric_title = reader.GetInt16(reader.GetOrdinal("electric_title"));
                 var electric_race = reader.GetFloat(reader.GetOrdinal("electric_race"));
@@ -549,6 +588,11 @@ WHERE id = @id;",
                 var level = reader.GetInt16(reader.GetOrdinal("level"));
                 var exp = reader.GetInt16(reader.GetOrdinal("exp"));
                 var det = reader.GetInt16(reader.GetOrdinal("det"));
+
+                var hp_rate = reader.GetFloat(reader.GetOrdinal("hp_rate"));
+                var sp_rate = reader.GetFloat(reader.GetOrdinal("sp_rate"));
+                var san_rate = reader.GetFloat(reader.GetOrdinal("san_rate"));
+                var mp_rate = reader.GetFloat(reader.GetOrdinal("mp_rate"));
 
                 var dict = System.Text.Json.JsonSerializer.Deserialize<List<string>>(reader.GetFieldValue<string>(reader.GetOrdinal("title_list")));
                 var title_list = string.Join(", ", dict);
@@ -581,6 +625,11 @@ WHERE id = @id;",
                 int app = (int)(app_race * (app_base + app_growth + app_life + app_class));
                 int luk = (int)(luk_race * (luk_base + luk_growth + luk_life + luk_class));
 
+                int hp = vit * 5 + str * 2;
+                int sp = (int)(0.1f * (str * 7 + agi * 3));
+                int san = pow * 5 + intS * 2;
+                int mp = (int)(0.05f * (mag * 7 + pow * 3));
+
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.Append("```\r\n");
                 stringBuilder.Append("●基本\r\n");
@@ -607,10 +656,10 @@ WHERE id = @id;",
                 stringBuilder.Append($"【冷属性】{(int)(cold_race * (cold_base + cold_title))}((基礎{cold_base}+称号{cold_title})×種族{cold_race})\r\n");
                 stringBuilder.Append($"【土属性】{(int)(soil_race * (soil_base + soil_title))}((基礎{soil_base}+称号{soil_title})×種族{soil_race})\r\n");
                 stringBuilder.Append($"●リソース\r\n");
-                stringBuilder.Append($"【HP最大値】{vit * 5 + str * 3} \r\n");
-                stringBuilder.Append($"【SP最大値】{(int)(0.1f * (str * 7 + agi * 3))}\r\n");
-                stringBuilder.Append($"【SAN最大値】{pow * 5 + intS * 3}\r\n");
-                stringBuilder.Append($"【MP最大値】{(int)(0.05f * (mag * 7 + vit * 3))}\r\n");
+                stringBuilder.Append($"【HP最大値】{(int)(hp * hp_rate)}({hp}×特性{hp_rate})\r\n");
+                stringBuilder.Append($"【SP最大値】{(int)(sp * sp_rate)}({sp}×特性{sp_rate})\r\n");
+                stringBuilder.Append($"【SAN最大値】{(int)(san * san_rate)}({san}×特性{san_rate})\r\n");
+                stringBuilder.Append($"【MP最大値】{(int)(mp * mp_rate)}({mp}×特性{mp_rate})\r\n");
                 stringBuilder.Append("●成長\r\n");
                 stringBuilder.Append($"【レベル】{level}\r\n");
                 stringBuilder.Append($"【経験値】{exp}\r\n");
@@ -632,7 +681,45 @@ WHERE id = @id;",
             },
             async () =>
             {
-                await message.Channel.SendMessageAsync("キャラクターが見つかりませんでした。");
+                await message.Channel.SendMessageAsync(@"```
+●基本
+【名前】ゾルファ
+【種族】
+【性別】
+【ライフパス】
+●能力値
+【生命】0((基礎0+成長0+ライフパス0+クラス0)×種族1)
+【精神】0((基礎0+成長0+ライフパス0+クラス0)×種族1)
+【筋力】0((基礎0+成長0+ライフパス0+クラス0)×種族1)
+【知力】0((基礎0+成長0+ライフパス0+クラス0)×種族1)
+【魔力】0((基礎0+成長0+ライフパス0+クラス0)×種族1)
+【器用】0((基礎0+成長0+ライフパス0+クラス0)×種族1)
+【敏捷】0((基礎0+成長0+ライフパス0+クラス0)×種族1)
+【感知】0((基礎0+成長0+ライフパス0+クラス0)×種族1)
+【魅力】0((基礎0+成長0+ライフパス0+クラス0)×種族1)
+【幸運】0((基礎0+成長0+ライフパス0+クラス0)×種族1)
+●属性値
+【火属性】0((基礎0+称号0)×種族1)
+【水属性】0((基礎0+称号0)×種族1)
+【風属性】0((基礎0+称号0)×種族1)
+【電属性】0((基礎0+称号0)×種族1)
+【冷属性】0((基礎0+称号0)×種族1)
+【土属性】0((基礎0+称号0)×種族1)
+●リソース
+【HP最大値】0(0×1)
+【SP最大値】0(0×1)
+【SAN最大値】0(0×1)
+【MP最大値】0(0×1)
+●成長
+【レベル】1
+【経験値】0
+【決意】0
+●習得称号
+●習得クラス
+●設定クラス
+●習得特性
+●習得スキル
+```");
             });
     }
 }

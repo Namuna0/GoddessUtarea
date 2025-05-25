@@ -87,7 +87,7 @@ partial class Program
             else if (content.StartsWith("?set luk ")) await SetAbi("luk", message, guild, user);
             else if (content.StartsWith("?set fire ")) await SetEle("fire", message, guild, user);
             else if (content.StartsWith("?set water ")) await SetEle("water", message, guild, user);
-            else if (content.StartsWith("?set wing ")) await SetEle("wing", message, guild, user);
+            else if (content.StartsWith("?set wind ")) await SetEle("wind", message, guild, user);
             else if (content.StartsWith("?set electric ")) await SetEle("electric", message, guild, user);
             else if (content.StartsWith("?set cold ")) await SetEle("cold", message, guild, user);
             else if (content.StartsWith("?set soil ")) await SetEle("soil", message, guild, user);
@@ -96,6 +96,7 @@ partial class Program
             else if (content.StartsWith("?exp ")) await UpdateExp(message, guild, user);
             else if (content.StartsWith("?det ")) await UpdateDet(message, guild, user);
             else if (content.StartsWith("?e&d ")) await UpdateExpDet(message, guild, user);
+            else if (content.StartsWith("?set resrate")) await SetResRate(message, guild, user);
             else if (content.StartsWith("?add sta ")) await AddSta(message, guild, user);
             else if (content.StartsWith("?remove sta ")) await RemoveSta(message, guild, user);
 
