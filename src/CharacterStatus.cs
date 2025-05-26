@@ -204,7 +204,7 @@ SET det = character_status.det + EXCLUDED.det;",
         var text = message.Content.Substring($"?e&d ".Length);
         var texts = text.Split(" ");
 
-        await Command(texts, 11, message, user, async (currentChara) =>
+        await Command(texts, 1, message, user, async (currentChara) =>
         {
             int add = short.Parse(texts[0]);
 
@@ -681,9 +681,9 @@ WHERE id = @id;",
             },
             async () =>
             {
-                await message.Channel.SendMessageAsync(@"```
+                await message.Channel.SendMessageAsync(@$"```
 ●基本
-【名前】ゾルファ
+【名前】{currentChara}
 【種族】
 【性別】
 【ライフパス】

@@ -87,7 +87,7 @@ partial class Program
         await ConnectDatabase(
             @"INSERT INTO character_equipment (id, max_hp, max_sp, max_san, max_mp, hp, sp, san, mp)" +
             @"VALUES (@id, 0, 0, 0, 0, 0, 0, 0, 0)" +
-            @"ON CONFLICT (id) DO UPDATE SET hp = max_hp, sp = max_sp, san = max_san, mp = max_mp;",
+            @"ON CONFLICT (id) DO UPDATE SET hp = character_equipment.max_hp, sp = character_equipment.max_sp, san = character_equipment.max_san, mp = character_equipment.max_mp;",
             parameters =>
             {
                 parameters.AddWithValue("id", currentChara);
