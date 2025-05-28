@@ -93,13 +93,7 @@ partial class Program
                 parameters.AddWithValue("id", currentChara);
             });
 
-        var status = new EquipmentStatus();
-        status.Hp = status.MaxHp;
-        status.Sp = status.MaxSp;
-        status.San = status.MaxSan;
-        status.Mp = status.MaxMp;
-
-        await DisplayResource(currentChara, status, message);
+        await DisplayResource(currentChara, message);
     }
 
     private async Task UpdateRes(string res, SocketMessage message, SocketGuild guild, SocketGuildUser user)
