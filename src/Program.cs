@@ -108,6 +108,8 @@ partial class Program
             else if (content.StartsWith("?coin ")) await UpdateCoin(message, guild, user);
 
             // 装備
+            else if (content.StartsWith("?set res bon ")) await SetResBon(message, guild, user);
+            else if (content.StartsWith("?set ele bon ")) await SetEleBon(message, guild, user);
             else if (content == "?show res") await ShowRes(message, guild, user);
             else if (content.StartsWith("?set res ")) await SetRes(message, guild, user);
             else if (content == "?reset res") await ResetRes(message, guild, user);
@@ -117,8 +119,6 @@ partial class Program
             else if (content.StartsWith("?mp ")) await UpdateRes("mp", message, guild, user);
             else if (content == "?show res bon") await ShowResBon(message, guild, user);
             else if (content == "?show ele bon") await ShowEleBon(message, guild, user);
-            else if (content.StartsWith("?set res bon ")) await SetResBon(message, guild, user);
-            else if (content.StartsWith("?set ele bon ")) await SetEleBon(message, guild, user);
             else if (content.StartsWith("?set wep ")) await SetWep(message, guild, user);
 
             else if (content == "?show master res") await ShowMasterRes(message, guild, user);
