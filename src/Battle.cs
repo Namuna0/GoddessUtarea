@@ -63,16 +63,17 @@ partial class Program
                 status.SnsB = reader.GetFloat(7);
                 status.AppB = reader.GetFloat(8);
                 status.LukB = reader.GetFloat(9);
-                status.WepP = reader.GetString(10);
 
-                status.FireB = reader.GetFloat(11);
-                status.WaterB = reader.GetFloat(12);
-                status.WindB = reader.GetFloat(13);
-                status.ElectricB = reader.GetFloat(14);
-                status.ColdB = reader.GetFloat(15);
-                status.SoilB = reader.GetFloat(16);
-                status.LightB = reader.GetFloat(17);
-                status.DarkB = reader.GetFloat(18);
+                status.FireB = reader.GetFloat(10);
+                status.WaterB = reader.GetFloat(11);
+                status.WindB = reader.GetFloat(12);
+                status.ElectricB = reader.GetFloat(13);
+                status.ColdB = reader.GetFloat(14);
+                status.SoilB = reader.GetFloat(15);
+                status.LightB = reader.GetFloat(16);
+                status.DarkB = reader.GetFloat(17);
+
+                status.WepP = reader.GetString(18);
 
                 CalcFormula(texts[0], status, out string culcResult, out string showResult);
 

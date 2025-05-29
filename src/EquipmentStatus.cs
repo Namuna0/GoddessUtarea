@@ -220,7 +220,7 @@ partial class Program
                     parameters.AddWithValue("dark_b", status.DarkB);
                 });
 
-            await DisplayResBonus(currentChara, status, message);
+            await DisplayEleBonus(currentChara, status, message);
         });
     }
 
