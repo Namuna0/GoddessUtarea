@@ -43,7 +43,7 @@ partial class Program
         }
 
         await ConnectDatabase(
-            @"SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b, wep_p FROM character_equipment WHERE id = @id",
+            @"SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b, fire_b, water_b, wind_b, electric_b, soil_b, wep_p FROM character_equipment WHERE id = @id",
             parameters =>
             {
                 parameters.AddWithValue("id", currentChara);
@@ -62,6 +62,12 @@ partial class Program
                 status.AppB = reader.GetFloat(8);
                 status.LukB = reader.GetFloat(9);
                 status.WepP = reader.GetString(10);
+
+                status.FireB = reader.GetFloat(11);
+                status.WaterB = reader.GetFloat(12);
+                status.WindB = reader.GetFloat(13);
+                status.ElectricB = reader.GetFloat(14);
+                status.SoilB = reader.GetFloat(15);
 
                 CalcFormula(texts[0], status, out string culcResult, out string showResult);
 
@@ -294,6 +300,11 @@ partial class Program
             ReplaceBonus("[感知B]", status.SnsB, ref culcText, ref showText);
             ReplaceBonus("[魅力B]", status.AppB, ref culcText, ref showText);
             ReplaceBonus("[幸運B]", status.LukB, ref culcText, ref showText);
+            ReplaceBonus("[火属性B]", status.FireB, ref culcText, ref showText);
+            ReplaceBonus("[水属性B]", status.WaterB, ref culcText, ref showText);
+            ReplaceBonus("[風属性B]", status.WindB, ref culcText, ref showText);
+            ReplaceBonus("[電属属B]", status.ElectricB, ref culcText, ref showText);
+            ReplaceBonus("[土属性B]", status.SoilB, ref culcText, ref showText);
         }
 
         CalcDice(ref culcText, ref showText);

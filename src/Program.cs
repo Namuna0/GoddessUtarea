@@ -116,7 +116,8 @@ partial class Program
             else if (content.StartsWith("?san ")) await UpdateRes("san", message, guild, user);
             else if (content.StartsWith("?mp ")) await UpdateRes("mp", message, guild, user);
             else if (content == "?show bon") await ShowBon(message, guild, user);
-            else if (content.StartsWith("?set bon ")) await SetBon(message, guild, user);
+            else if (content.StartsWith("?set res bon ")) await SetResBon(message, guild, user);
+            else if (content.StartsWith("?set ele bon ")) await SetEleBon(message, guild, user);
             else if (content.StartsWith("?set wep ")) await SetWep(message, guild, user);
 
             else if (content == "?show master res") await ShowMasterRes(message, guild, user);
