@@ -1,5 +1,4 @@
 ﻿using Discord.WebSocket;
-using System.Text.RegularExpressions;
 
 partial class Program
 {
@@ -29,7 +28,10 @@ partial class Program
         public float WaterB { get; set; }
         public float WindB { get; set; }
         public float ElectricB { get; set; }
+        public float ColdB { get; set; }
         public float SoilB { get; set; }
+        public float LightB { get; set; }
+        public float DarkB { get; set; }
 
         public string WepP { get; set; } = "0";
     }
@@ -122,7 +124,7 @@ partial class Program
         });
     }
 
-    private async Task ShowBon(SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    private async Task ShowResBon(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
         if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
         {
@@ -131,6 +133,17 @@ partial class Program
         }
 
         await DisplayResBonus(currentChara, message);
+    }
+
+    private async Task ShowEleBon(SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    {
+        if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
+        {
+            await message.Channel.SendMessageAsync("「?login [キャラクター名]」を呼んでください。");
+            return;
+        }
+
+        await DisplayEleBonus(currentChara, message);
     }
 
     private async Task SetResBon(SocketMessage message, SocketGuild guild, SocketGuildUser user)
@@ -170,7 +183,7 @@ partial class Program
                     parameters.AddWithValue("luk_b", status.LukB);
                 });
 
-            await DisplayBonus(currentChara, status, message);
+            await DisplayResBonus(currentChara, status, message);
         });
     }
 
@@ -178,19 +191,22 @@ partial class Program
     {
         var text = message.Content.Substring("?set ele bon ".Length);
         var texts = text.Split(" ");
-        await Command(texts, 222222, message, user, async (currentChara) =>
+        await Command(texts, 22222222, message, user, async (currentChara) =>
         {
             var status = new EquipmentStatus();
             status.FireB = float.Parse(texts[0]);
             status.WaterB = float.Parse(texts[1]);
             status.WindB = float.Parse(texts[2]);
             status.ElectricB = float.Parse(texts[3]);
-            status.SoilB = float.Parse(texts[4]);
+            status.ColdB = float.Parse(texts[4]);
+            status.SoilB = float.Parse(texts[5]);
+            status.LightB = float.Parse(texts[6]);
+            status.DarkB = float.Parse(texts[7]);
 
             await ConnectDatabase(
                 @"INSERT INTO character_equipment (id, fire_b, water_b, wind_b, electric_b, cold_b, soil_b, light_b, dark_b)" +
-                @"VALUES (@id, @fire_b, @water_b, @wind_b, @electric_b, @soil_b)" +
-                @"ON CONFLICT (id) DO UPDATE SET fire_b = EXCLUDED.fire_b, water_b = EXCLUDED.water_b, wind_b = EXCLUDED.wind_b, electric_b = EXCLUDED.electric_b, soil_b = EXCLUDED.soil_b, soil_b = EXCLUDED.soil_b;",
+                @"VALUES (@id, @fire_b, @water_b, @wind_b, @electric_b, @cold_b, @soil_b, @light_b, @dark_b)" +
+                @"ON CONFLICT (id) DO UPDATE SET fire_b = EXCLUDED.fire_b, water_b = EXCLUDED.water_b, wind_b = EXCLUDED.wind_b, electric_b = EXCLUDED.electric_b, cold_b = EXCLUDED.cold_b, soil_b = EXCLUDED.soil_b, light_b = EXCLUDED.light_b, dark_b = EXCLUDED.dark_b;",
                 parameters =>
                 {
                     parameters.AddWithValue("id", currentChara);
@@ -198,10 +214,13 @@ partial class Program
                     parameters.AddWithValue("water_b", status.WaterB);
                     parameters.AddWithValue("wind_b", status.WindB);
                     parameters.AddWithValue("electric_b", status.ElectricB);
+                    parameters.AddWithValue("cold_b", status.ColdB);
                     parameters.AddWithValue("soil_b", status.SoilB);
+                    parameters.AddWithValue("lightb", status.LightB);
+                    parameters.AddWithValue("dark_b", status.DarkB);
                 });
 
-            await DisplayBonus(currentChara, status, message);
+            await DisplayResBonus(currentChara, status, message);
         });
     }
 
@@ -344,11 +363,11 @@ WHERE id = @id;",
     {
         await ConnectDatabase(
 @"WITH upsert AS (
-  INSERT INTO character_equipment (id, fire_b, water_b, wind_b, electric_b, soil_b)
-  VALUES (@id, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+  INSERT INTO character_equipment (id, fire_b, water_b, wind_b, electric_b, cold_b, soil_b, light_b, dark_b)
+  VALUES (@id, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
   ON CONFLICT (id) DO NOTHING
 )
-SELECT fire_b, water_b, wind_b, electric_b, soil_b
+SELECT fire_b, water_b, wind_b, electric_b, cold_b, soil_b, light_b, dark_b
 FROM character_equipment
 WHERE id = @id;",
             parameters =>
@@ -359,7 +378,7 @@ WHERE id = @id;",
             {
                 await message.Channel.SendMessageAsync(
                     $"{currentChara}\r\n" +
-                    "●能力値B\r\n" +
+                    "●属性値B\r\n" +
                     $"{reader.GetFloat(0).ToString("0.##")} 火属性, {reader.GetFloat(1).ToString("0.##")} 水属性, {reader.GetFloat(2).ToString("0.##")} 風属性, {reader.GetFloat(3).ToString("0.##")} 電属性\r\n" +
                     $"{reader.GetFloat(4).ToString("0.##")} 冷属性, {reader.GetFloat(5).ToString("0.##")} 土属性, {reader.GetFloat(6).ToString("0.##")} 光属性, {reader.GetFloat(7).ToString("0.##")} 闇属性");
             },
@@ -367,13 +386,13 @@ WHERE id = @id;",
             {
                 await message.Channel.SendMessageAsync(
                     $"{currentChara}\r\n" +
-                    "●能力値B\r\n" +
-                    $"1 生命, 1 精神, 1 筋力, 1 知力, 1 魔力\r\n" +
-                    $"1 器用, 1 敏捷, 1 感知, 1 魅力, 1 幸運");
+                    "●属性値B\r\n" +
+                    $"1 火属性, 1 水属性, 1 風属性, 1 電属性\r\n" +
+                    $"1 冷属性, 1 土属性, 1 土属性, 1 闇属性");
             });
     }
 
-    private async Task DisplayBonus(string currentChara, EquipmentStatus status, SocketMessage message)
+    private async Task DisplayResBonus(string currentChara, EquipmentStatus status, SocketMessage message)
     {
         await message.Channel.SendMessageAsync(
             $"{currentChara}\r\n" +
@@ -381,5 +400,14 @@ WHERE id = @id;",
             $"{status.VitB.ToString("0.##")} 生命, {status.PowB.ToString("0.##")} 精神, {status.StrB.ToString("0.##")} 筋力, {status.IntB.ToString("0.##")} 知力, {status.MagB.ToString("0.##")} 魔力\r\n" +
             $"{status.DexB.ToString("0.##")} 器用, {status.AgiB.ToString("0.##")} 敏捷, {status.SnsB.ToString("0.##")} 感知, {status.AppB.ToString("0.##")} 魅力, {status.LukB.ToString("0.##")} 幸運");
         ;
+    }
+
+    private async Task DisplayEleBonus(string currentChara, EquipmentStatus status, SocketMessage message)
+    {
+        await message.Channel.SendMessageAsync(
+            $"{currentChara}\r\n" +
+            "●属性値B\r\n" +
+            $"{status.FireB.ToString("0.##")} 火属性, {status.WaterB.ToString("0.##")} 水属性, {status.WindB.ToString("0.##")} 風属性, {status.ElectricB.ToString("0.##")} 電属性\r\n" +
+            $"{status.ColdB.ToString("0.##")} 冷属性, {status.SoilB.ToString("0.##")} 土属性, {status.LightB.ToString("0.##")} 光属性, {status.DarkB.ToString("0.##")} 闇属性");
     }
 }

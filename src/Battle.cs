@@ -7,7 +7,9 @@ partial class Program
     {
         public short MaxHp { get; set; }
         public short Hp { get; set; }
-        public float AgiB { get; set; }
+        public float BonB { get; set; }
+        public float EleB { get; set; }
+
     }
 
     private async Task SimpleRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user)
@@ -43,7 +45,7 @@ partial class Program
         }
 
         await ConnectDatabase(
-            @"SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b, fire_b, water_b, wind_b, electric_b, soil_b, wep_p FROM character_equipment WHERE id = @id",
+            @"SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b, fire_b, water_b, wind_b, electric_b, cold_b, soil_b, light_b, drak_b, wep_p FROM character_equipment WHERE id = @id",
             parameters =>
             {
                 parameters.AddWithValue("id", currentChara);
@@ -67,7 +69,10 @@ partial class Program
                 status.WaterB = reader.GetFloat(12);
                 status.WindB = reader.GetFloat(13);
                 status.ElectricB = reader.GetFloat(14);
-                status.SoilB = reader.GetFloat(15);
+                status.ColdB = reader.GetFloat(15);
+                status.SoilB = reader.GetFloat(16);
+                status.LightB = reader.GetFloat(17);
+                status.DarkB = reader.GetFloat(18);
 
                 CalcFormula(texts[0], status, out string culcResult, out string showResult);
 
@@ -177,7 +182,11 @@ partial class Program
 
     private async Task ShowNpcBon(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = message.Content.Substring($"?show npc bon ".Length);
+        var text = "";
+
+        if (message.Content.StartsWith("?show npc res bon ")) text = message.Content.Substring($"?show npc res bon ".Length);
+        else text = message.Content.Substring($"?show npc ele bon ".Length);
+
         var texts = text.Split(" ");
         await Command(texts, 3, message, user, async (currentChara) =>
         {
@@ -193,7 +202,7 @@ partial class Program
 
     private async Task SetNpcBon(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
-        var text = message.Content.Substring($"?set npc agi ".Length);
+        var text = message.Content.Substring($"?set npc res bon ".Length);
         var texts = text.Split(" ");
         await Command(texts, 23, message, user, async (currentChara) =>
         {
@@ -203,7 +212,25 @@ partial class Program
                 _npcStatus.Add(texts[0], status);
             }
 
-            status.AgiB = float.Parse(texts[1]);
+            status.BonB = float.Parse(texts[1]);
+
+            await DisplayNpcBonus(texts[0], status, message);
+        });
+    }
+
+    private async Task SetNpcEle(SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    {
+        var text = message.Content.Substring($"?set npc ele bon ".Length);
+        var texts = text.Split(" ");
+        await Command(texts, 23, message, user, async (currentChara) =>
+        {
+            if (!_npcStatus.TryGetValue(texts[0], out var status))
+            {
+                status = new NpcStatus();
+                _npcStatus.Add(texts[0], status);
+            }
+
+            status.EleB = float.Parse(texts[1]);
 
             await DisplayNpcBonus(texts[0], status, message);
         });
@@ -253,7 +280,9 @@ partial class Program
         await message.Channel.SendMessageAsync(
             $"{npc}\r\n" +
             "●能力値B\r\n" +
-            $"{status.AgiB.ToString("0.##")} 敏捷");
+            $"{status.BonB.ToString("0.##")} 能力\r\n" +
+             "●属性値B\r\n" +
+            $"{status.EleB.ToString("0.##")} 属性");
         ;
     }
 
@@ -264,14 +293,16 @@ partial class Program
 
         if (status != null)
         {
-            ReplaceBonus("[敏捷B]", status.AgiB, ref culcText, ref showText);
+            ReplaceBonus("[能力B]", status.BonB, ref culcText, ref showText);
+            ReplaceBonus("[属性B]", status.EleB, ref culcText, ref showText);
         }
 
         CalcDice(ref culcText, ref showText);
 
         if (status != null)
         {
-            CalcBonusDice("敏捷R", status.AgiB, ref culcText, ref showText);
+            CalcBonusDice("能力R", status.BonB, ref culcText, ref showText);
+            CalcBonusDice("属性R", status.EleB, ref culcText, ref showText);
         }
 
         var expr = new NCalc.Expression(culcText);
@@ -304,7 +335,10 @@ partial class Program
             ReplaceBonus("[水属性B]", status.WaterB, ref culcText, ref showText);
             ReplaceBonus("[風属性B]", status.WindB, ref culcText, ref showText);
             ReplaceBonus("[電属属B]", status.ElectricB, ref culcText, ref showText);
+            ReplaceBonus("[冷属性B]", status.ColdB, ref culcText, ref showText);
             ReplaceBonus("[土属性B]", status.SoilB, ref culcText, ref showText);
+            ReplaceBonus("[光属性B]", status.LightB, ref culcText, ref showText);
+            ReplaceBonus("[闇属性B]", status.DarkB, ref culcText, ref showText);
         }
 
         CalcDice(ref culcText, ref showText);

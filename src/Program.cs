@@ -115,7 +115,8 @@ partial class Program
             else if (content.StartsWith("?sp ")) await UpdateRes("sp", message, guild, user);
             else if (content.StartsWith("?san ")) await UpdateRes("san", message, guild, user);
             else if (content.StartsWith("?mp ")) await UpdateRes("mp", message, guild, user);
-            else if (content == "?show bon") await ShowBon(message, guild, user);
+            else if (content == "?show res bon") await ShowResBon(message, guild, user);
+            else if (content == "?show ele bon") await ShowEleBon(message, guild, user);
             else if (content.StartsWith("?set res bon ")) await SetResBon(message, guild, user);
             else if (content.StartsWith("?set ele bon ")) await SetEleBon(message, guild, user);
             else if (content.StartsWith("?set wep ")) await SetWep(message, guild, user);
@@ -134,8 +135,10 @@ partial class Program
             else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user);
             else if (content.StartsWith("?set npc res ")) await SetNpcRes(message, guild, user);
             else if (content.StartsWith("?npc hp ")) await UpdateNpcHp(message, guild, user);
-            else if (content.StartsWith("?show npc bon ")) await ShowNpcBon(message, guild, user);
-            else if (content.StartsWith("?set npc bon ")) await SetNpcBon(message, guild, user);
+            else if (content.StartsWith("?show npc res bon ")) await ShowNpcBon(message, guild, user);
+            else if (content.StartsWith("?show npc ele bon ")) await ShowNpcBon(message, guild, user);
+            else if (content.StartsWith("?set npc res bon ")) await SetNpcBon(message, guild, user);
+            else if (content.StartsWith("?set npc ele bon ")) await SetNpcEle(message, guild, user);
             else if (content.StartsWith("?npc r ")) await NpcDiceRoll(message, guild, user);
         }
     }
