@@ -216,7 +216,7 @@ partial class Program
                     parameters.AddWithValue("electric_b", status.ElectricB);
                     parameters.AddWithValue("cold_b", status.ColdB);
                     parameters.AddWithValue("soil_b", status.SoilB);
-                    parameters.AddWithValue("lightb", status.LightB);
+                    parameters.AddWithValue("light_b", status.LightB);
                     parameters.AddWithValue("dark_b", status.DarkB);
                 });
 
@@ -388,7 +388,7 @@ WHERE id = @id;",
                     $"{currentChara}\r\n" +
                     "●属性値B\r\n" +
                     $"1 火属性, 1 水属性, 1 風属性, 1 電属性\r\n" +
-                    $"1 冷属性, 1 土属性, 1 土属性, 1 闇属性");
+                    $"1 冷属性, 1 土属性, 1 光属性, 1 闇属性");
             });
     }
 
