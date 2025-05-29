@@ -45,7 +45,7 @@ partial class Program
         }
 
         await ConnectDatabase(
-            @"SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b, fire_b, water_b, wind_b, electric_b, cold_b, soil_b, light_b, drak_b, wep_p FROM character_equipment WHERE id = @id",
+            @"SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b, fire_b, water_b, wind_b, electric_b, cold_b, soil_b, light_b, dark_b, wep_p FROM character_equipment WHERE id = @id",
             parameters =>
             {
                 parameters.AddWithValue("id", currentChara);
