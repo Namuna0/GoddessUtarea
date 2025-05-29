@@ -165,7 +165,7 @@ partial class Program
                 await message.Channel.SendMessageAsync(
                     $"<@{user.Id}> :game_die:{currentChara}{comment}" +
                     $"{stringBuilder.ToString()}\r\n" +
-                    $"total：{total.ToString("0.##")}");
+                    $"Total：{total.ToString("0.##")}");
             },
             async () =>
             {
