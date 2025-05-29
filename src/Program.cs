@@ -91,6 +91,8 @@ partial class Program
             else if (content.StartsWith("?set electric ")) await SetEle("electric", message, guild, user);
             else if (content.StartsWith("?set cold ")) await SetEle("cold", message, guild, user);
             else if (content.StartsWith("?set soil ")) await SetEle("soil", message, guild, user);
+            else if (content.StartsWith("?set light ")) await SetEle("light", message, guild, user);
+            else if (content.StartsWith("?set dark ")) await SetEle("dark", message, guild, user);
 
             else if (content.StartsWith("?level ")) await UpdateLevel(message, guild, user);
             else if (content.StartsWith("?exp ")) await UpdateExp(message, guild, user);
@@ -130,6 +132,7 @@ partial class Program
             // バトル
             else if (content == "?r") await SimpleRoll(message, guild, user);
             else if (content.StartsWith("?r ")) await DiceRoll(message, guild, user);
+            else if (content.StartsWith("?rr ")) await DiceMultiRoll(message, guild, user);
             else if (content == "?durr") await RollDurability(message, guild, user);
 
             else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user);

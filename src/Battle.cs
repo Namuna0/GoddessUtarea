@@ -1,4 +1,5 @@
 ﻿using Discord.WebSocket;
+using System.Text;
 using System.Text.RegularExpressions;
 
 partial class Program
@@ -85,7 +86,86 @@ partial class Program
 
                 await message.Channel.SendMessageAsync(
                     $"<@{user.Id}> :game_die:{currentChara}{comment}\r\n" +
-                    $"{showResult}=>{culcResult}");
+                    $"{showResult} => {culcResult}");
+            },
+            async () =>
+            {
+                await message.Channel.SendMessageAsync("キャラクターが見つかりませんでした。");
+            });
+    }
+
+
+    private async Task DiceMultiRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    {
+        var text = message.Content.Substring("?rr ".Length);
+        var texts = text.Split(" ");
+
+        if (!GetPaseFlag(texts, 31) && !GetPaseFlag(texts, 331))
+        {
+            await message.Channel.SendMessageAsync("引数が変です。");
+            return;
+        }
+
+        if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
+        {
+            await message.Channel.SendMessageAsync("「?login [キャラクター名]」を呼んでください。");
+            return;
+        }
+
+        await ConnectDatabase(
+            @"SELECT vit_b, pow_b, str_b, int_b, mag_b, dex_b, agi_b, sns_b, app_b, luk_b, fire_b, water_b, wind_b, electric_b, cold_b, soil_b, light_b, dark_b, wep_p FROM character_equipment WHERE id = @id",
+            parameters =>
+            {
+                parameters.AddWithValue("id", currentChara);
+            },
+            async (reader) =>
+            {
+                var status = new EquipmentStatus();
+                status.VitB = reader.GetFloat(0);
+                status.PowB = reader.GetFloat(1);
+                status.StrB = reader.GetFloat(2);
+                status.IntB = reader.GetFloat(3);
+                status.MagB = reader.GetFloat(4);
+                status.DexB = reader.GetFloat(5);
+                status.AgiB = reader.GetFloat(6);
+                status.SnsB = reader.GetFloat(7);
+                status.AppB = reader.GetFloat(8);
+                status.LukB = reader.GetFloat(9);
+
+                status.FireB = reader.GetFloat(10);
+                status.WaterB = reader.GetFloat(11);
+                status.WindB = reader.GetFloat(12);
+                status.ElectricB = reader.GetFloat(13);
+                status.ColdB = reader.GetFloat(14);
+                status.SoilB = reader.GetFloat(15);
+                status.LightB = reader.GetFloat(16);
+                status.DarkB = reader.GetFloat(17);
+
+                status.WepP = reader.GetString(18);
+
+                StringBuilder stringBuilder = new StringBuilder();
+
+                float total = 0;
+
+                for (int i = 0; i < int.Parse(texts[0]); i++)
+                {
+                    CalcFormula(texts[1], status, out string culcResult, out string showResult);
+
+                    stringBuilder.Append($"\r\n{showResult} => {culcResult}");
+
+                    total += float.Parse(culcResult);
+                }
+
+                string comment = string.Empty;
+                if (texts.Length > 2)
+                {
+                    comment = $"：{texts[2]}";
+                }
+
+                await message.Channel.SendMessageAsync(
+                    $"<@{user.Id}> :game_die:{currentChara}{comment}" +
+                    $"{stringBuilder.ToString()}\r\n" +
+                    $"total：{total.ToString("0.##")}");
             },
             async () =>
             {
