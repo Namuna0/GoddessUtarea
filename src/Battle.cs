@@ -356,6 +356,15 @@ partial class Program
             CalcBonusDice("感知R", status.SnsB, ref culcText, ref showText);
             CalcBonusDice("魅力R", status.AppB, ref culcText, ref showText);
             CalcBonusDice("幸運R", status.LukB, ref culcText, ref showText);
+
+            CalcBonusDice("火属性R", status.FireB, ref culcText, ref showText);
+            CalcBonusDice("水属性R", status.WaterB, ref culcText, ref showText);
+            CalcBonusDice("風属性R", status.WindB, ref culcText, ref showText);
+            CalcBonusDice("電属性R", status.ElectricB, ref culcText, ref showText);
+            CalcBonusDice("冷属性R", status.ColdB, ref culcText, ref showText);
+            CalcBonusDice("土属性R", status.SoilB, ref culcText, ref showText);
+            CalcBonusDice("光属性R", status.LightB, ref culcText, ref showText);
+            CalcBonusDice("闇属性R", status.DarkB, ref culcText, ref showText);
         }
 
         var expr = new NCalc.Expression(culcText);
