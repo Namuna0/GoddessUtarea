@@ -134,6 +134,7 @@ partial class Program
             else if (content.StartsWith("?r ")) await DiceRoll(message, guild, user);
             else if (content.StartsWith("?rr ")) await DiceMultiRoll(message, guild, user);
             else if (content == "?durr") await RollDurability(message, guild, user);
+            else if (content == "?sevr") await RollSevere(message, guild, user);
 
             else if (content.StartsWith("?show npc res")) await ShowNpcRes(message, guild, user);
             else if (content.StartsWith("?set npc res ")) await SetNpcRes(message, guild, user);
