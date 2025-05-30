@@ -294,6 +294,8 @@ INSERT INTO character_status (id, race, gender, life_path,
     electric_base, electric_title, electric_race,
     cold_base, cold_title, cold_race,
     soil_base, soil_title, soil_race,
+    light_base, light_title, light_race,
+    dark_base, dark_title, dark_race,
     level, exp, det,
     hp_rate, sp_rate, san_rate, mp_rate,
     title_list,
@@ -312,6 +314,8 @@ INSERT INTO character_status (id, race, gender, life_path,
     0, 0, 0, 0, 1.0,
     0, 0, 0, 0, 1.0,
     0, 0, 0, 0, 1.0,
+    0, 0, 1.0,
+    0, 0, 1.0,
     0, 0, 1.0,
     0, 0, 1.0,
     0, 0, 1.0,
@@ -377,6 +381,8 @@ INSERT INTO character_status (id, race, gender, life_path,
     electric_base, electric_title, electric_race,
     cold_base, cold_title, cold_race,
     soil_base, soil_title, soil_race,
+    light_base, light_title, light_race,
+    dark_base, dark_title, dark_race,
     level, exp, det,
     hp_rate, sp_rate, san_rate, mp_rate,
     title_list,
@@ -395,6 +401,8 @@ INSERT INTO character_status (id, race, gender, life_path,
     0, 0, 0, 0, 1.0,
     0, 0, 0, 0, 1.0,
     0, 0, 0, 0, 1.0,
+    0, 0, 1.0,
+    0, 0, 1.0,
     0, 0, 1.0,
     0, 0, 1.0,
     0, 0, 1.0,
@@ -447,6 +455,8 @@ DO UPDATE SET {listName} = (
         electric_base, electric_title, electric_race,
         cold_base, cold_title, cold_race,
         soil_base, soil_title, soil_race,
+        light_base, light_title, light_race,
+        dark_base, dark_title, dark_race,
         level, exp, det,
         hp_rate, sp_rate, san_rate, mp_rate,
         title_list,
@@ -465,6 +475,8 @@ DO UPDATE SET {listName} = (
         0, 0, 0, 0, 1.0,
         0, 0, 0, 0, 1.0,
         0, 0, 0, 0, 1.0,
+        0, 0, 1.0,
+        0, 0, 1.0,
         0, 0, 1.0,
         0, 0, 1.0,
         0, 0, 1.0,
@@ -498,6 +510,8 @@ wind_base, wind_title, wind_race,
 electric_base, electric_title, electric_race,
 cold_base, cold_title, cold_race,
 soil_base, soil_title, soil_race,
+light_base, light_title, light_race,
+dark_base, dark_title, dark_race,
 level, exp, det,
 hp_rate, sp_rate, san_rate, mp_rate,
 title_list,
@@ -585,6 +599,13 @@ WHERE id = @id;",
                 var soil_base = reader.GetInt16(reader.GetOrdinal("soil_base"));
                 var soil_title = reader.GetInt16(reader.GetOrdinal("soil_title"));
                 var soil_race = reader.GetFloat(reader.GetOrdinal("soil_race"));
+                var light_base = reader.GetInt16(reader.GetOrdinal("light_base"));
+                var light_title = reader.GetInt16(reader.GetOrdinal("light_title"));
+                var light_race = reader.GetFloat(reader.GetOrdinal("light_race"));
+                var dark_base = reader.GetInt16(reader.GetOrdinal("dark_base"));
+                var dark_title = reader.GetInt16(reader.GetOrdinal("dark_title"));
+                var dark_race = reader.GetFloat(reader.GetOrdinal("dark_race"));
+
                 var level = reader.GetInt16(reader.GetOrdinal("level"));
                 var exp = reader.GetInt16(reader.GetOrdinal("exp"));
                 var det = reader.GetInt16(reader.GetOrdinal("det"));
@@ -655,6 +676,8 @@ WHERE id = @id;",
                 stringBuilder.Append($"【電属性】{(int)(electric_race * (electric_base + electric_title))}((基礎{electric_base}+称号{electric_title})×種族{electric_race})\r\n");
                 stringBuilder.Append($"【冷属性】{(int)(cold_race * (cold_base + cold_title))}((基礎{cold_base}+称号{cold_title})×種族{cold_race})\r\n");
                 stringBuilder.Append($"【土属性】{(int)(soil_race * (soil_base + soil_title))}((基礎{soil_base}+称号{soil_title})×種族{soil_race})\r\n");
+                stringBuilder.Append($"【光属性】{(int)(light_race * (light_base + light_title))}((基礎{light_base}+称号{light_title})×種族{light_race})\r\n");
+                stringBuilder.Append($"【闇属性】{(int)(dark_race * (dark_base + dark_title))}((基礎{dark_base}+称号{dark_title})×種族{dark_race})\r\n");
                 stringBuilder.Append($"●リソース\r\n");
                 stringBuilder.Append($"【HP最大値】{(int)(hp * hp_rate)}({hp}×特性{hp_rate})\r\n");
                 stringBuilder.Append($"【SP最大値】{(int)(sp * sp_rate)}({sp}×特性{sp_rate})\r\n");
@@ -681,6 +704,7 @@ WHERE id = @id;",
             },
             async () =>
             {
+
                 await message.Channel.SendMessageAsync(@$"```
 ●基本
 【名前】{currentChara}
@@ -705,6 +729,8 @@ WHERE id = @id;",
 【電属性】0((基礎0+称号0)×種族1)
 【冷属性】0((基礎0+称号0)×種族1)
 【土属性】0((基礎0+称号0)×種族1)
+【光属性】0((基礎0+称号0)×種族1)
+【闇属性】0((基礎0+称号0)×種族1)
 ●リソース
 【HP最大値】0(0×1)
 【SP最大値】0(0×1)

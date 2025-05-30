@@ -41,7 +41,15 @@ INSERT INTO user_storage (id, copper_coin, silver_coin, gold_coin, holly_coin, e
 VALUES (
     @id,
     0, 0, 0, 0,
-    jsonb_build_object(@item_id, GREATEST(@amount, 0)), '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb
+    jsonb_build_object(
+        @item_id,
+        jsonb_build_object(
+            'count', GREATEST(@amount, 0),
+            'durability', 10,
+            'max_durability', 10
+        )
+    ),
+    '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb
 )
 ON CONFLICT (id)
 DO UPDATE SET {listName} = 
