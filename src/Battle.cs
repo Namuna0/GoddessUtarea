@@ -202,7 +202,7 @@ partial class Program
 
         await message.Channel.SendMessageAsync(
             $"<@{user.Id}> :game_die:{currentChara}\r\n" +
-            $"{showText}=>{showText}\r\n" +
+            $"{showText} => {culcText}\r\n" +
             $"耐久ロール：{part}");
     }
 
@@ -231,7 +231,7 @@ partial class Program
 
         await message.Channel.SendMessageAsync(
             $"<@{user.Id}> :game_die:{currentChara}\r\n" +
-            $"{showText}=>{showText}\r\n" +
+            $"{showText} => {culcText}\r\n" +
             $"重症ロール：{part}");
     }
 
