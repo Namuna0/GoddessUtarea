@@ -224,15 +224,46 @@ partial class Program
         int eye = int.Parse(culcText);
 
         string part = "";
-        if (eye == 1) part = "さらにダイスロールを行います。「1d100*[幸運B] 目標値60」\r\n《救出》成功した場合、奇跡的に救出され、無事に助かります。\r\n《死亡》失敗した場合、キャラクターは無惨に遺棄され《ロスト》状態になります。\r\nただし《女神ウタレアの加護》など、ロストを無効にする特性を持っている場合は《救出》されます。";
-        else if (eye == 2) part = "《盗難》あなた達は救出はされました、しかし所持品の一部は敵によって奪われてしまったようです。\r\n所持しているジルダの全額とアイテムの中から価値が最も高いものを1つ失ってしまう。\r\n蘇生費として32ジルダ消費。リソースの全回復と全ての状態を解除して、最後に訪れた町エリアに移動します。";
-        else if (eye <= 5) part = "《救出》あなた達は救助隊によって遺体が回収され、無事蘇生されます。\r\n蘇生費として32ジルダ消費。リソースの全回復と全ての状態を解除して、最後に訪れた町エリアに移動します。";
-        else part = "《救助》あなた達は通りすがりの冒険者に助けられ、キャラクターの遺体が発見されます。\r\n蘇生され。リソースの全回復と全ての状態を解除して、最後に訪れた町エリアに移動します。";
+        if (eye == 1) part = "《大出血》永続的に、毎ターン開始時にHP最大値の15%のダメージを受けます。";
+        else if (eye == 2) part = "《失明》永続的に、〈攻撃〉の目標値が2倍になります。";
+        else if (eye == 3) part = "《腕部骨折》永続的に、毎ターン開始時に[ACT]を3ポイント失います。";
+        else if (eye == 4) part = "《脚部骨折》永続的に、〈移動〉と〈回避〉の達成値が0.5倍になります。";
+        else if (eye == 5) part = "《脳震盪》1ターンの間、キャラクターは一切の行動ができなくなります。";
+        else part = "何も起こりません。";
 
         await message.Channel.SendMessageAsync(
             $"<@{user.Id}> :game_die:{currentChara}\r\n" +
             $"{showText} => {culcText}\r\n" +
             $"重症ロール：{part}");
+    }
+
+    private async Task RollDeath(SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    {
+        if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
+        {
+            await message.Channel.SendMessageAsync("「?login [キャラクター名]」を呼んでください。");
+            return;
+        }
+
+        var culcText = "1d6";
+        var showText = "1d6";
+
+        CalcDice(ref culcText, ref showText);
+
+        showText = showText.Replace("*", @"\*");
+
+        int eye = int.Parse(culcText);
+
+        string part = "";
+        if (eye == 1) part = "さらにダイスロールを行います。「1d100*[幸運B] 目標値60」\r\n成功した場合、あなたのキャラクターは奇跡的に救出され、無事に助かります。《救出》と同じ効果を適用してください。\r\n失敗した場合、あなたのキャラクターは無惨に遺棄され《ロスト》状態となります。\r\nただし《女神ウタレアの加護》など、ロストを無効にする特性を持っている場合は女神ウタレアの慈悲により奇跡が起こり救出されます。《救出》と同じ効果を適用してください。";
+        else if (eye == 2) part = "《盗難》あなた達は救出はされました、しかし所持品の一部は敵によって奪われてしまったようです。\r\n所持しているジルダの全額とアイテムの中から価値が最も高いものを1つ失ってしまう。\r\n経験値-3, 決意-3,蘇生費として32ジルダ消費。リソースの全回復と全ての状態を解除して、最後に訪れた町エリアに移動します。";
+        else if (eye <= 5) part = "《救出》あなた達は救助隊によって遺体が回収され、無事蘇生されます。\r\n経験値-3, 決意-3, 蘇生費として32ジルダ消費。リソースの全回復と全ての状態を解除して、最後に訪れた町エリアに移動します。";
+        else part = "《救助》あなた達は通りすがりの冒険者に助けられ、キャラクターの遺体が発見されます。\r\n蘇生され。リソースの全回復と全ての状態を解除して、最後に訪れた町エリアに移動します。";
+
+        await message.Channel.SendMessageAsync(
+            $"<@{user.Id}> :game_die:{currentChara}\r\n" +
+            $"{showText} => {culcText}\r\n" +
+            $"全滅ロール：{part}");
     }
 
 
