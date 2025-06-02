@@ -45,8 +45,8 @@ VALUES (
         @item_id,
         jsonb_build_object(
             'count', GREATEST(@amount, 0),
-            'durability', 10,
-            'max_durability', 10
+            'durability', 5,
+            'max_durability', 5
         )
     ),
     '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb, '{{}}'::jsonb
@@ -62,8 +62,8 @@ DO UPDATE SET {listName} =
                 @path,
                 jsonb_build_object(
                     'count', GREATEST(COALESCE((user_storage.{listName}->@item_id->>'count')::int, 0) + @amount, 0),
-                    'durability', COALESCE((user_storage.{listName}->@item_id->>'durability')::int, 10),
-                    'max_durability', COALESCE((user_storage.{listName}->@item_id->>'max_durability')::int, 10)
+                    'durability', COALESCE((user_storage.{listName}->@item_id->>'durability')::int, 5),
+                    'max_durability', COALESCE((user_storage.{listName}->@item_id->>'max_durability')::int, 5)
                 ),
                 true
             )
