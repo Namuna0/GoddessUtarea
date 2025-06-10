@@ -113,7 +113,7 @@ partial class Program
             await ConnectDatabase(
                 @$"INSERT INTO character_equipment (id, {res})" +
                 @$"VALUES (@id, @{res})" +
-                @$"ON CONFLICT (id) DO UPDATE SET {res} = character_equipment.{res} + EXCLUDED.{res};",
+                @$"ON CONFLICT (id) DO UPDATE SET {res} = LEAST(character_equipment.{res} + EXCLUDED.{res}, character_equipment.max_{res});",
                 parameters =>
                 {
                     parameters.AddWithValue("id", currentChara);
@@ -267,7 +267,7 @@ partial class Program
             await ConnectDatabase(
                 @$"INSERT INTO character_equipment (id, {res})" +
                 @$"VALUES (@id, @{res})" +
-                @$"ON CONFLICT (id) DO UPDATE SET {res} = character_equipment.{res} + EXCLUDED.{res};",
+                @$"ON CONFLICT (id) DO UPDATE SET {res} = LEAST(character_equipment.{res} + EXCLUDED.{res}, character_equipment.max_{res});",
                 parameters =>
                 {
                     parameters.AddWithValue("id", texts[0]);

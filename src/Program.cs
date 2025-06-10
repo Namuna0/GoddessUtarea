@@ -56,6 +56,8 @@ partial class Program
         await _client.StartAsync();
 
         //await Create();
+
+        await Start();
     }
 
     private async Task MessageReceivedAsync(SocketMessage message)

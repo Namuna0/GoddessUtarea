@@ -6,6 +6,7 @@ partial class Program
     public async Task ConnectDatabase(string sql, Action<NpgsqlParameterCollection> onCommand = null, Func<NpgsqlDataReader, Task> onResponce = null, Func<Task> onError = null)
     {
         var url = Environment.GetEnvironmentVariable("DATABASE_URL");
+
         if (string.IsNullOrEmpty(url))
         {
             Console.WriteLine("DATABASE_URLが設定されていません");
@@ -105,29 +106,21 @@ partial class Program
 
     private async Task Create()
     {
-        var createSql = @"ALTER TABLE character_status
-ALTER COLUMN light_race SET DEFAULT 1.0,
-ALTER COLUMN dark_race SET DEFAULT 1.0;";
+        //        var createSql = @"ALTER TABLE character_status
+        //ALTER COLUMN light_race SET DEFAULT 1.0,
+        //ALTER COLUMN dark_race SET DEFAULT 1.0;";
 
         //var createSql = @"DROP TABLE character_status;";
-        await ConnectDatabase(createSql);
+        //await ConnectDatabase(createSql);
 
 
 
-        //        var createSql = @"
-        //CREATE TABLE character_status (
-        //  id TEXT PRIMARY KEY,
-        //  copper_coin INT DEFAULT 0,
-        //  silver_coin INT DEFAULT 0,
-        //  gold_coin INT DEFAULT 0,
-        //  holly_coin INT DEFAULT 0,
-        //  equipment_list JSONB DEFAULT '{}',
-        //  valuable_list JSONB DEFAULT '{}',
-        //  recipe_list JSONB DEFAULT '{}',
-        //  tool_list JSONB DEFAULT '{}',
-        //  material_list JSONB DEFAULT '{}',
-        //  farm_list JSONB DEFAULT '{}'
-        //);";
+        var createSql = @"
+       CREATE TABLE login_status (
+  discord_id BIGINT PRIMARY KEY,
+  character_name TEXT NOT NULL DEFAULT '',
+  created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);";
 
 
 

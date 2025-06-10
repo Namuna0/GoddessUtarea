@@ -1,4 +1,7 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
+using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 
 partial class Program
@@ -13,10 +16,38 @@ partial class Program
             await message.Channel.SendMessageAsync("引数が変です。");
             return;
         }
+        
+        await ConnectDatabase($@"
+            INSERT INTO login_status (discord_id, character_name)
+            VALUES (@discord_id, @character_name)
+            ON CONFLICT (discord_id) DO UPDATE
+            SET character_name = EXCLUDED.character_name;",
+            parameters =>
+            {
+                parameters.AddWithValue("discord_id", (long)user.Id);
+                parameters.AddWithValue("character_name", texts[0]);
+            });
 
         _currentCharaDic[user.Id] = texts[0];
 
         await message.Channel.SendMessageAsync($"こんにちは、{texts[0]}さん！");
+    }
+
+    private async Task Start()
+    {
+        await ConnectDatabase("SELECT * FROM login_status;",
+            onResponce: async (reader) =>
+            {
+                do
+                {
+                    var userId = (ulong)reader.GetInt64(reader.GetOrdinal("discord_id"));
+                    var characterName = reader.GetString(reader.GetOrdinal("character_name"));
+
+                    _currentCharaDic[userId] = characterName;
+                } while (reader.Read());
+
+                await Task.CompletedTask;
+            });
     }
 
     private async Task ShowSta(SocketMessage message, SocketGuild guild, SocketGuildUser user)

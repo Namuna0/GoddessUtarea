@@ -133,15 +133,18 @@ VALUES (
 )
 ON CONFLICT (id)
 DO UPDATE SET equipment_list = jsonb_set(
-user_storage.equipment_list::jsonb,
-@path,
-jsonb_build_object(
-    'count', COALESCE((user_storage.equipment_list->@item_id->>'count')::int, 1),
-    'durability', GREATEST(COALESCE((user_storage.equipment_list->@item_id->>'durability')::int, 0) + @amount, 0),
-    'max_durability', COALESCE((user_storage.equipment_list->@item_id->>'max_durability')::int, 0)
-),
-true
-            );",
+    user_storage.equipment_list::jsonb,
+    @path,
+    jsonb_build_object(
+        'count', COALESCE((user_storage.equipment_list->@item_id->>'count')::int, 1),
+        'durability', LEAST(
+            COALESCE((user_storage.equipment_list->@item_id->>'durability')::int, 0) + @amount,
+            COALESCE((user_storage.equipment_list->@item_id->>'max_durability')::int, 0)
+        ),
+        'max_durability', COALESCE((user_storage.equipment_list->@item_id->>'max_durability')::int, 0)
+    ),
+    true
+);",
             parameters =>
             {
                 parameters.AddWithValue("item_id", texts[0]);
