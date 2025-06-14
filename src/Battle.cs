@@ -25,7 +25,7 @@ partial class Program
 
         await message.Channel.SendMessageAsync(
         $"<@{user.Id}> :game_die:{currentChara}\r\n" +
-        $"{showResult}=>{culcResult}");
+        $"{showResult} => {culcResult}");
     }
 
     private async Task DiceRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user)
@@ -93,7 +93,6 @@ partial class Program
                 await message.Channel.SendMessageAsync("キャラクターが見つかりませんでした。");
             });
     }
-
 
     private async Task DiceMultiRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user)
     {
@@ -171,6 +170,121 @@ partial class Program
             {
                 await message.Channel.SendMessageAsync("キャラクターが見つかりませんでした。");
             });
+    }
+
+    private async Task PickRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    {
+        if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
+        {
+            await message.Channel.SendMessageAsync("「?login [キャラクター名]」を呼んでください。");
+            return;
+        }
+
+        var text = message.Content.Substring("?p ".Length);
+        var texts = text.Split(" ");
+
+        if (texts.Length <= 2)
+        {
+            await message.Channel.SendMessageAsync("引数が変です。");
+            return;
+        }
+
+        if (!int.TryParse(texts[0], out int pickCount))
+        {
+            await message.Channel.SendMessageAsync("引数が変です。");
+            return;
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder2 = new StringBuilder();
+
+        List<string> list = new List<string>();
+
+        for (int i = 1; i < texts.Length; i++)
+        {
+            list.Add(texts[i]);
+
+            stringBuilder2.Append(texts[i]);
+            if (i < texts.Length - 1) stringBuilder2.Append($", ");
+        }
+
+        for (int i = 0; i < pickCount && list.Count > 0; i++)
+        {
+            int rand = _ms.Next(0, list.Count);
+
+            stringBuilder.Append(list[rand]);
+            if (i < pickCount - 1) stringBuilder.Append($", ");
+
+            list.Remove(list[rand]);
+        }
+
+        await message.Channel.SendMessageAsync(
+        $"<@{user.Id}> :game_die:{currentChara}\r\n" +
+        $"{stringBuilder2} => {stringBuilder}");
+    }
+
+    private async Task PickMultiRoll(SocketMessage message, SocketGuild guild, SocketGuildUser user)
+    {
+        if (!_currentCharaDic.TryGetValue(user.Id, out var currentChara))
+        {
+            await message.Channel.SendMessageAsync("「?login [キャラクター名]」を呼んでください。");
+            return;
+        }
+
+        var text = message.Content.Substring("?pp ".Length);
+        var texts = text.Split(" ");
+
+        if (texts.Length <= 3)
+        {
+            await message.Channel.SendMessageAsync("引数が変です。");
+            return;
+        }
+
+        if (!int.TryParse(texts[0], out int tryCount))
+        {
+            await message.Channel.SendMessageAsync("引数が変です。");
+            return;
+        }
+
+        if (!int.TryParse(texts[1], out int pickCount))
+        {
+            await message.Channel.SendMessageAsync("引数が変です。");
+            return;
+        }
+
+        StringBuilder stringBuilder3 = new StringBuilder();
+
+        for (int tryIndex = 0; tryIndex < tryCount; tryIndex++)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder stringBuilder2 = new StringBuilder();
+
+            List<string> list = new List<string>();
+
+            for (int i = 2; i < texts.Length; i++)
+            {
+                list.Add(texts[i]);
+
+                stringBuilder2.Append(texts[i]);
+                if (i < texts.Length - 1) stringBuilder2.Append($", ");
+            }
+
+            for (int i = 0; i < pickCount && list.Count > 0; i++)
+            {
+                int rand = _ms.Next(0, list.Count);
+
+                stringBuilder.Append(list[rand]);
+                if (i < pickCount - 1) stringBuilder.Append($", ");
+
+                list.Remove(list[rand]);
+            }
+
+            stringBuilder3.Append($"\r\n{stringBuilder2} => {stringBuilder}");
+        }
+
+        await message.Channel.SendMessageAsync(
+        $"<@{user.Id}> :game_die:{currentChara}" +
+        $"{stringBuilder3}");
     }
 
     private async Task RollDurability(SocketMessage message, SocketGuild guild, SocketGuildUser user)
@@ -405,7 +519,7 @@ partial class Program
 
         await message.Channel.SendMessageAsync(
         $"<@{user.Id}> :game_die:{texts[0]}{comment}\r\n" +
-        $"{showResult}=>{culcResult}");
+        $"{showResult} => {culcResult}");
     }
 
     private async Task DisplayNpcResource(string npc, NpcStatus status, SocketMessage message)

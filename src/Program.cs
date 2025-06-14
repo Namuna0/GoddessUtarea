@@ -135,6 +135,8 @@ partial class Program
             else if (content == "?r") await SimpleRoll(message, guild, user);
             else if (content.StartsWith("?r ")) await DiceRoll(message, guild, user);
             else if (content.StartsWith("?rr ")) await DiceMultiRoll(message, guild, user);
+            else if (content.StartsWith("?p ")) await PickRoll(message, guild, user);
+            else if (content.StartsWith("?pp ")) await PickMultiRoll(message, guild, user);
             else if (content == "?durr") await RollDurability(message, guild, user);
             else if (content == "?sevr") await RollSevere(message, guild, user);
             else if (content == "?dthr") await RollDeath(message, guild, user);
